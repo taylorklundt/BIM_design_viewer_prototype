@@ -17,18 +17,110 @@
       place-items: center;
       background: #ffffff;
       font-family: Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    .hero {
+      position: relative;
+      isolation: isolate;
+      padding: 2rem;
     }
 
     h1 {
+      position: relative;
+      z-index: 2;
       color: #1f1f1f;
       font-size: clamp(2rem, 8vw, 5rem);
       letter-spacing: 0.14em;
       text-transform: uppercase;
       font-weight: 700;
+      opacity: 0;
+      filter: blur(12px);
+      transform: translateY(16px) scale(0.985);
+      animation: text-in 1.35s ease-out 0.2s forwards;
+    }
+
+    .dust {
+      position: absolute;
+      inset: 10% -6%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .dust span {
+      position: absolute;
+      width: var(--size);
+      height: var(--size);
+      left: var(--x);
+      top: var(--y);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(32, 32, 32, 0.22), rgba(32, 32, 32, 0));
+      filter: blur(2px);
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale(0.55);
+      animation: dust-cloud 1.9s ease-out var(--delay) forwards;
+    }
+
+    @keyframes text-in {
+      0% {
+        opacity: 0;
+        filter: blur(12px);
+        transform: translateY(16px) scale(0.985);
+      }
+      55% {
+        opacity: 1;
+        filter: blur(1px);
+      }
+      100% {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes dust-cloud {
+      0% {
+        opacity: 0;
+        transform: translate3d(0, 0, 0) scale(0.55);
+      }
+      35% {
+        opacity: 0.28;
+      }
+      100% {
+        opacity: 0;
+        transform: translate3d(var(--dx), var(--dy), 0) scale(1.28);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      h1 {
+        animation: none;
+        opacity: 1;
+        filter: none;
+        transform: none;
+      }
+
+      .dust span {
+        animation: none;
+        opacity: 0;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>TAYLOR KLUNDT</h1>
+  <div class="hero" aria-label="Taylor Klundt intro">
+    <div class="dust" aria-hidden="true">
+      <span style="--size: 92px; --x: 12%; --y: 46%; --dx: -18px; --dy: -22px; --delay: 0.00s;"></span>
+      <span style="--size: 78px; --x: 19%; --y: 34%; --dx: -10px; --dy: -26px; --delay: 0.06s;"></span>
+      <span style="--size: 110px; --x: 27%; --y: 56%; --dx: -6px; --dy: -18px; --delay: 0.10s;"></span>
+      <span style="--size: 96px; --x: 38%; --y: 40%; --dx: 4px; --dy: -24px; --delay: 0.14s;"></span>
+      <span style="--size: 88px; --x: 49%; --y: 58%; --dx: 8px; --dy: -16px; --delay: 0.18s;"></span>
+      <span style="--size: 104px; --x: 60%; --y: 44%; --dx: 16px; --dy: -20px; --delay: 0.24s;"></span>
+      <span style="--size: 82px; --x: 70%; --y: 52%; --dx: 18px; --dy: -14px; --delay: 0.30s;"></span>
+      <span style="--size: 74px; --x: 77%; --y: 36%; --dx: 14px; --dy: -28px; --delay: 0.34s;"></span>
+      <span style="--size: 66px; --x: 85%; --y: 48%; --dx: 22px; --dy: -12px; --delay: 0.40s;"></span>
+    </div>
+    <h1>TAYLOR KLUNDT</h1>
+  </div>
 </body>
 </html>
