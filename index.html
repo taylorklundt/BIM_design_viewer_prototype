@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taylor Klundt — Product Designer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #1f2328;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    .resume {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    /* ── LEFT SIDEBAR ── */
+    .sidebar {
+      width: clamp(300px, 31vw, 430px);
+      background: #2d2d2d;
+      color: #ccc;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .profile-photo {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      min-height: 280px;
+      max-height: 44vh;
+      overflow: hidden;
+    }
+
+    .profile-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+      display: block;
+    }
+
+    .sidebar-content {
+      padding: 36px 30px;
+      flex: 1;
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #e8b93c;
+      margin-bottom: 18px;
+    }
+
+    .intro {
+      margin-bottom: 40px;
+    }
+
+    .intro p {
+      font-size: 0.82rem;
+      line-height: 1.75;
+      color: #b0b0b0;
+      font-weight: 300;
+    }
+
+    .details {
+      margin-bottom: 0;
+    }
+
+    .detail-item {
+      margin-bottom: 22px;
+    }
+
+    .detail-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-label {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 0.82rem;
+      color: #ccc;
+      font-weight: 400;
+    }
+
+    .detail-value a {
+      color: #ccc;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .detail-value a:hover {
+      color: #e8b93c;
+    }
+
+    /* ── RIGHT MAIN CONTENT ── */
+    .main {
+      flex: 1 1 auto;
+      background: #fff;
+      padding: 50px clamp(28px, 4vw, 56px) 40px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #2d2d2d;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .header .subtitle {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 400;
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      color: #888;
+    }
+
+    /* ── EXPERIENCE ── */
+    .experience {
+      margin-bottom: 44px;
+    }
+
+    .experience .section-title {
+      text-align: center;
+      color: #2d2d2d;
+      font-size: 0.9rem;
+      letter-spacing: 3px;
+      margin-bottom: 30px;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 160px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 148px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: #e0e0e0;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 28px;
+      padding-left: 28px;
+    }
+
+    .timeline-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -7px;
+      top: 7px;
+      width: 12px;
+      height: 12px;
+      background: #e8b93c;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      z-index: 1;
+    }
+
+    .timeline-date {
+      position: absolute;
+      left: -155px;
+      top: 2px;
+      width: 120px;
+      text-align: right;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: #888;
+    }
+
+    .timeline-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #2d2d2d;
+      margin-bottom: 6px;
+    }
+
+    .timeline-desc {
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: #777;
+      font-weight: 300;
+    }
+
+    /* ── BOTTOM SECTION ── */
+    .bottom-section {
+      display: flex;
+      gap: 50px;
+      margin-top: auto;
+      padding-top: 36px;
+      border-top: 1px solid #eee;
+    }
+
+    .software {
+      flex: 1;
+    }
+
+    .hobbies {
+      flex: 1;
+    }
+
+    .bottom-section .section-title {
+      color: #2d2d2d;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      margin-bottom: 20px;
+    }
+
+    /* ── SOFTWARE BARS ── */
+    .skill {
+      margin-bottom: 14px;
+    }
+
+    .skill:last-child {
+      margin-bottom: 0;
+    }
+
+    .skill-name {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #2d2d2d;
+      margin-bottom: 6px;
+    }
+
+    .skill-bar {
+      height: 6px;
+      background: #e8e8e8;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .skill-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #e8b93c, #d4a02e);
+      transition: width 1s ease;
+    }
+
+    /* ── HOBBIES GRID ── */
+    .hobbies-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .hobby-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+    }
+
+    .hobby-icon svg {
+      width: 30px;
+      height: 30px;
+      fill: #e8b93c;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .sidebar {
+        width: clamp(290px, 34vw, 390px);
+      }
+
+      .main {
+        padding: 36px 30px 30px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .timeline {
+        padding-left: 130px;
+      }
+
+      .timeline::before {
+        left: 118px;
+      }
+
+      .timeline-date {
+        left: -125px;
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .resume {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-width: unset;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .profile-photo {
+        width: 42%;
+        min-height: 220px;
+        max-height: none;
+        aspect-ratio: 1 / 1;
+      }
+
+      .sidebar-content {
+        width: 60%;
+        padding: 24px 24px;
+      }
+
+      .main { padding: 30px 24px 24px; }
+
+      .header h1 {
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+      }
+
+      .header .subtitle {
+        letter-spacing: 5px;
+        font-size: 0.75rem;
+      }
+
+      .bottom-section {
+        flex-direction: column;
+        gap: 30px;
+      }
+    }
+
+    @media (max-width: 500px) {
+      .sidebar {
+        flex-direction: column;
+      }
+
+      .profile-photo {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+      }
+
+      .sidebar-content {
+        width: 100%;
+      }
+
+      .timeline {
+        padding-left: 0;
+      }
+
+      .timeline::before {
+        display: none;
+      }
+
+      .timeline-item {
+        padding-left: 0;
+      }
+
+      .timeline-item::before {
+        display: none;
+      }
+
+      .timeline-date {
+        position: static;
+        width: auto;
+        text-align: left;
+        margin-bottom: 4px;
+        color: #e8b93c;
+      }
+
+      .header h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="resume">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="profile-photo">
+      <img src="assets/headshot.jpg" alt="Taylor Klundt">
+    </div>
+
+    <div class="sidebar-content">
+      <div class="intro">
+        <h2 class="section-title">Intro</h2>
+        <p>I care about doing great work, in a great work environment. I value the people I work with, and appreciate an energetic culture. I am driven and focused and make sure I do my best to hit deadlines and perform above expectation. Outside of my work life I try to spend most of my time outdoors; snowboarding, dirt biking, scuba diving, camping, shooting photography, hanging out at the family lake cabin, and going out with friends.</p>
+      </div>
+
+      <div class="details">
+        <h2 class="section-title">Details</h2>
+
+        <div class="detail-item">
+          <div class="detail-label">Phone</div>
+          <div class="detail-value"><a href="tel:5093852090">509-385-2090</a></div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">Email</div>
+          <div class="detail-value"><a href="mailto:taylorklundt@gmail.com">taylorklundt@gmail.com</a></div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">Website</div>
+          <div class="detail-value"><a href="https://taylorklundt.com" target="_blank">taylorklundt.com</a></div>
+        </div>
+
+        <div class="detail-item">
+          <div class="detail-label">Dribbble</div>
+          <div class="detail-value"><a href="https://dribbble.com/taylorklundt" target="_blank">dribbble.com/taylorklundt</a></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT MAIN CONTENT -->
+  <main class="main">
+    <div class="header">
+      <h1>Taylor Klundt</h1>
+      <div class="subtitle">Product Designer</div>
+    </div>
+
+    <section class="experience">
+      <h2 class="section-title">Experience</h2>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <span class="timeline-date">2012–2013</span>
+          <div class="timeline-title">SFCC 2013 – AAS Degree</div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="timeline-date">2013</span>
+          <div class="timeline-title">Kl&uuml;ndt Hosmer – Agency</div>
+          <div class="timeline-desc">During college I worked here designing websites, brochures, magazines, corporate identities. I learnt the importance of design, detail, file structure and working with a team.</div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="timeline-date">2012–2013</span>
+          <div class="timeline-title">Seven2 &amp; 14Four – Agency</div>
+          <div class="timeline-desc">Upon graduation and completing my 3 month internship with Seven2 I was hired on as a Graphic and UI Designer where I worked closely with programmers, account manager, and clients. Much of the work consisted of creating digital content for Disney.</div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="timeline-date">2012–2013</span>
+          <div class="timeline-title">The Great PNW – Clothing Company</div>
+          <div class="timeline-desc">My responsibilities include; product design, lifestyle &amp; product photography; (including being lead photographer on the seasonal campaigns), and design and creation.</div>
+        </div>
+
+        <div class="timeline-item">
+          <span class="timeline-date">2012–2013</span>
+          <div class="timeline-title">Procore Technologies – Construction Management Software</div>
+          <div class="timeline-desc">My responsibilities include; product design, lifestyle &amp; product photography; (including being lead photographer on the seasonal campaigns), and design and creation of branded email campaigns. I am also responsible for the day to day.</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="bottom-section">
+      <div class="software">
+        <h2 class="section-title">Software</h2>
+        <div class="skill">
+          <div class="skill-name">Figma</div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 95%"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-name">Photoshop</div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 90%"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-name">Illustrator</div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 75%"></div></div>
+        </div>
+        <div class="skill">
+          <div class="skill-name">Lightroom</div>
+          <div class="skill-bar"><div class="skill-fill" style="width: 65%"></div></div>
+        </div>
+      </div>
+
+      <div class="hobbies">
+        <h2 class="section-title">Hobbies</h2>
+        <div class="hobbies-grid">
+          <div class="hobby-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.94-.49-7-3.85-7-7.93 0-.62.08-1.22.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          </div>
+          <div class="hobby-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.5 14l1-5 2 1.5V22h2v-7.5l-2-3 .5-2.5c1.1 1.3 2.8 2 4.5 2v-2c-1.2 0-2.3-.5-3-1.5l-1-1.5c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7-1.6 8.1-4.6-1-.4 2 5.3 1.5z"/></svg>
+          </div>
+          <div class="hobby-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15 1H9v2h6V1zm-4 13h2V8h-2v6zm8.03-6.61l1.42-1.42c-.43-.51-.9-.99-1.41-1.41l-1.42 1.42A8.962 8.962 0 0 0 12 4c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-2.12-.74-4.07-1.97-5.61zM12 20c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+          </div>
+          <div class="hobby-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg>
+          </div>
+          <div class="hobby-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+          </div>
+          <div class="hobby-icon">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3zm0 11.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+</div>
+
+</body>
+</html>
