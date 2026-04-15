@@ -5,122 +5,201 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Taylor Klundt</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
-      display: grid;
-      place-items: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #ffffff;
-      font-family: Arial, sans-serif;
       overflow: hidden;
     }
 
-    .hero {
-      position: relative;
-      isolation: isolate;
-      padding: 2rem;
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
     }
 
-    h1 {
-      position: relative;
-      z-index: 2;
-      color: #1f1f1f;
+    noscript {
+      font-family: Arial, sans-serif;
       font-size: clamp(2rem, 8vw, 5rem);
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
       font-weight: 700;
-      opacity: 0;
-      filter: blur(12px);
-      transform: translateY(16px) scale(0.985);
-      animation: text-in 1.35s ease-out 0.2s forwards;
-    }
-
-    .dust {
-      position: absolute;
-      inset: 10% -6%;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .dust span {
-      position: absolute;
-      width: var(--size);
-      height: var(--size);
-      left: var(--x);
-      top: var(--y);
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(32, 32, 32, 0.22), rgba(32, 32, 32, 0));
-      filter: blur(2px);
-      opacity: 0;
-      transform: translate3d(0, 0, 0) scale(0.55);
-      animation: dust-cloud 1.9s ease-out var(--delay) forwards;
-    }
-
-    @keyframes text-in {
-      0% {
-        opacity: 0;
-        filter: blur(12px);
-        transform: translateY(16px) scale(0.985);
-      }
-      55% {
-        opacity: 1;
-        filter: blur(1px);
-      }
-      100% {
-        opacity: 1;
-        filter: blur(0);
-        transform: translateY(0) scale(1);
-      }
-    }
-
-    @keyframes dust-cloud {
-      0% {
-        opacity: 0;
-        transform: translate3d(0, 0, 0) scale(0.55);
-      }
-      35% {
-        opacity: 0.28;
-      }
-      100% {
-        opacity: 0;
-        transform: translate3d(var(--dx), var(--dy), 0) scale(1.28);
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      h1 {
-        animation: none;
-        opacity: 1;
-        filter: none;
-        transform: none;
-      }
-
-      .dust span {
-        animation: none;
-        opacity: 0;
-      }
+      letter-spacing: 0.14em;
+      color: #1a1a1a;
     }
   </style>
 </head>
 <body>
-  <div class="hero" aria-label="Taylor Klundt intro">
-    <div class="dust" aria-hidden="true">
-      <span style="--size: 92px; --x: 12%; --y: 46%; --dx: -18px; --dy: -22px; --delay: 0.00s;"></span>
-      <span style="--size: 78px; --x: 19%; --y: 34%; --dx: -10px; --dy: -26px; --delay: 0.06s;"></span>
-      <span style="--size: 110px; --x: 27%; --y: 56%; --dx: -6px; --dy: -18px; --delay: 0.10s;"></span>
-      <span style="--size: 96px; --x: 38%; --y: 40%; --dx: 4px; --dy: -24px; --delay: 0.14s;"></span>
-      <span style="--size: 88px; --x: 49%; --y: 58%; --dx: 8px; --dy: -16px; --delay: 0.18s;"></span>
-      <span style="--size: 104px; --x: 60%; --y: 44%; --dx: 16px; --dy: -20px; --delay: 0.24s;"></span>
-      <span style="--size: 82px; --x: 70%; --y: 52%; --dx: 18px; --dy: -14px; --delay: 0.30s;"></span>
-      <span style="--size: 74px; --x: 77%; --y: 36%; --dx: 14px; --dy: -28px; --delay: 0.34s;"></span>
-      <span style="--size: 66px; --x: 85%; --y: 48%; --dx: 22px; --dy: -12px; --delay: 0.40s;"></span>
-    </div>
-    <h1>TAYLOR KLUNDT</h1>
-  </div>
+  <canvas id="c"></canvas>
+  <noscript>TAYLOR KLUNDT</noscript>
+  <script>
+  (() => {
+    const TEXT = 'TAYLOR KLUNDT';
+    const FONT_FAMILY = 'Arial, Helvetica, sans-serif';
+    const PARTICLE_COLOR = [26, 26, 26];
+    const SAMPLE_GAP = 3;
+    const PARTICLE_RADIUS = 1.4;
+    const SCATTER_RADIUS_FACTOR = 0.9;
+    const DRIFT_DURATION = 1200;
+    const CONVERGE_DURATION = 2200;
+    const SETTLE_DURATION = 600;
+
+    const canvas = document.getElementById('c');
+    const ctx = canvas.getContext('2d');
+    let dpr, W, H, particles, textTargets, startTime, phase;
+
+    function sampleText() {
+      const offscreen = document.createElement('canvas');
+      const octx = offscreen.getContext('2d');
+
+      let fontSize = Math.min(W * 0.072, H * 0.14, 90);
+      if (W < 500) fontSize = W * 0.085;
+
+      offscreen.width = W;
+      offscreen.height = H;
+      octx.fillStyle = '#000';
+      octx.font = `800 ${fontSize}px ${FONT_FAMILY}`;
+      octx.textAlign = 'center';
+      octx.textBaseline = 'middle';
+
+      const letterSpacing = fontSize * 0.14;
+      const chars = TEXT.split('');
+      const totalWidth = chars.reduce((sum, ch) => sum + octx.measureText(ch).width + letterSpacing, 0) - letterSpacing;
+      let cursorX = (W - totalWidth) / 2;
+
+      for (const ch of chars) {
+        const m = octx.measureText(ch);
+        octx.fillText(ch, cursorX + m.width / 2, H / 2);
+        cursorX += m.width + letterSpacing;
+      }
+
+      const imageData = octx.getImageData(0, 0, W, H);
+      const points = [];
+      for (let y = 0; y < H; y += SAMPLE_GAP) {
+        for (let x = 0; x < W; x += SAMPLE_GAP) {
+          if (imageData.data[(y * W + x) * 4 + 3] > 128) {
+            points.push({ x, y });
+          }
+        }
+      }
+      return points;
+    }
+
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+    function easeInOutQuart(t) {
+      return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
+    }
+
+    function rand(min, max) { return min + Math.random() * (max - min); }
+
+    function createParticles() {
+      const scatter = Math.max(W, H) * SCATTER_RADIUS_FACTOR;
+      particles = textTargets.map(target => {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = rand(scatter * 0.35, scatter);
+        return {
+          x: W / 2 + Math.cos(angle) * dist,
+          y: H / 2 + Math.sin(angle) * dist,
+          tx: target.x,
+          ty: target.y,
+          startX: 0,
+          startY: 0,
+          driftVx: rand(-0.3, 0.3),
+          driftVy: rand(-0.3, 0.3),
+          delay: rand(0, 0.35),
+          size: rand(PARTICLE_RADIUS * 0.7, PARTICLE_RADIUS * 1.3),
+        };
+      });
+      for (const p of particles) {
+        p.startX = p.x;
+        p.startY = p.y;
+      }
+    }
+
+    function init() {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.round(window.innerWidth);
+      H = Math.round(window.innerHeight);
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + 'px';
+      canvas.style.height = H + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      textTargets = sampleText();
+      createParticles();
+      startTime = performance.now();
+      phase = 'drift';
+    }
+
+    function draw(now) {
+      const elapsed = now - startTime;
+      ctx.clearRect(0, 0, W, H);
+
+      const [r, g, b] = PARTICLE_COLOR;
+
+      for (const p of particles) {
+        let x, y, alpha;
+        const particleElapsed = elapsed;
+
+        if (particleElapsed < DRIFT_DURATION) {
+          const t = Math.min(particleElapsed / DRIFT_DURATION, 1);
+          x = p.startX + p.driftVx * particleElapsed;
+          y = p.startY + p.driftVy * particleElapsed;
+          alpha = 0.08 + t * 0.22;
+        } else {
+          const cStart = DRIFT_DURATION + p.delay * CONVERGE_DURATION * 0.6;
+          const cElapsed = Math.max(0, particleElapsed - cStart);
+          const cTotal = CONVERGE_DURATION * (1 - p.delay * 0.4);
+          const rawT = Math.min(cElapsed / cTotal, 1);
+          const t = easeInOutQuart(rawT);
+
+          const driftEndX = p.startX + p.driftVx * DRIFT_DURATION;
+          const driftEndY = p.startY + p.driftVy * DRIFT_DURATION;
+
+          x = driftEndX + (p.tx - driftEndX) * t;
+          y = driftEndY + (p.ty - driftEndY) * t;
+
+          if (rawT < 1) {
+            const jitter = (1 - t) * 1.5;
+            x += Math.sin(now * 0.003 + p.delay * 40) * jitter;
+            y += Math.cos(now * 0.0025 + p.delay * 40) * jitter;
+          }
+
+          alpha = 0.30 + t * 0.70;
+        }
+
+        ctx.beginPath();
+        ctx.arc(x, y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+        ctx.fill();
+      }
+
+      const totalDuration = DRIFT_DURATION + CONVERGE_DURATION + SETTLE_DURATION;
+      if (elapsed < totalDuration) {
+        requestAnimationFrame(draw);
+      } else {
+        ctx.clearRect(0, 0, W, H);
+        for (const p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.tx, p.ty, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${r},${g},${b},1)`;
+          ctx.fill();
+        }
+      }
+    }
+
+    init();
+    requestAnimationFrame(draw);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => { init(); requestAnimationFrame(draw); }, 200);
+    });
+  })();
+  </script>
 </body>
 </html>
