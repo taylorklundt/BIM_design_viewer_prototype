@@ -6,27 +6,19 @@
   <title>Taylor Klundt</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #ffffff;
+      height: 100vh;
+      background: #fff;
       overflow: hidden;
     }
-
-    canvas {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-    }
-
+    canvas { display: block; }
     noscript {
-      font-family: Arial, sans-serif;
-      font-size: clamp(2rem, 8vw, 5rem);
-      font-weight: 700;
-      letter-spacing: 0.14em;
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font: 700 clamp(2rem,8vw,5rem)/1 Arial, sans-serif;
+      letter-spacing: .14em;
       color: #1a1a1a;
     }
   </style>
@@ -36,168 +28,167 @@
   <noscript>TAYLOR KLUNDT</noscript>
   <script>
   (() => {
-    const TEXT = 'TAYLOR KLUNDT';
-    const FONT_FAMILY = 'Arial, Helvetica, sans-serif';
-    const PARTICLE_COLOR = [26, 26, 26];
-    const SAMPLE_GAP = 3;
-    const PARTICLE_RADIUS = 1.4;
-    const SCATTER_RADIUS_FACTOR = 0.9;
-    const DRIFT_DURATION = 1200;
-    const CONVERGE_DURATION = 2200;
-    const SETTLE_DURATION = 600;
+    const TEXT       = 'TAYLOR KLUNDT';
+    const FONT       = 'Arial, Helvetica, sans-serif';
+    const R          = 26, G = 26, B = 26;
+    const GAP        = 2;
+    const DOT        = 1.15;
+    const ANIM_MS    = 3400;
+    const STAGGER    = 0.10;
 
     const canvas = document.getElementById('c');
-    const ctx = canvas.getContext('2d');
-    let dpr, W, H, particles, textTargets, startTime, phase;
+    const ctx    = canvas.getContext('2d');
+    let dpr, W, H, particles, t0, finished;
 
-    function sampleText() {
-      const offscreen = document.createElement('canvas');
-      const octx = offscreen.getContext('2d');
+    const rand = (a, b) => a + Math.random() * (b - a);
 
-      let fontSize = Math.min(W * 0.072, H * 0.14, 90);
-      if (W < 500) fontSize = W * 0.085;
+    // Critically-damped spring produces one smooth continuous deceleration
+    // with no inflection points or phase shifts.
+    const K   = 7.5;
+    const NORM = 1 / (1 - (1 + K) * Math.exp(-K));
+    function spring(t) {
+      return (1 - (1 + K * t) * Math.exp(-K * t)) * NORM;
+    }
 
-      offscreen.width = W;
-      offscreen.height = H;
-      octx.fillStyle = '#000';
-      octx.font = `800 ${fontSize}px ${FONT_FAMILY}`;
-      octx.textAlign = 'center';
-      octx.textBaseline = 'middle';
+    function sampleTargets() {
+      const off = document.createElement('canvas');
+      const oc  = off.getContext('2d');
+      off.width  = W;
+      off.height = H;
 
-      const letterSpacing = fontSize * 0.14;
+      let fs = Math.min(W * 0.074, H * 0.15, 94);
+      if (W < 520) fs = W * 0.088;
+
+      oc.font         = `800 ${fs}px ${FONT}`;
+      oc.textBaseline  = 'middle';
+      oc.fillStyle     = '#000';
+
+      const sp    = fs * 0.13;
       const chars = TEXT.split('');
-      const totalWidth = chars.reduce((sum, ch) => sum + octx.measureText(ch).width + letterSpacing, 0) - letterSpacing;
-      let cursorX = (W - totalWidth) / 2;
+      const tw    = chars.reduce((s, c) => s + oc.measureText(c).width + sp, 0) - sp;
+      let cx      = (W - tw) / 2;
 
       for (const ch of chars) {
-        const m = octx.measureText(ch);
-        octx.fillText(ch, cursorX + m.width / 2, H / 2);
-        cursorX += m.width + letterSpacing;
+        const w = oc.measureText(ch).width;
+        oc.fillText(ch, cx, H / 2);
+        cx += w + sp;
       }
 
-      const imageData = octx.getImageData(0, 0, W, H);
-      const points = [];
-      for (let y = 0; y < H; y += SAMPLE_GAP) {
-        for (let x = 0; x < W; x += SAMPLE_GAP) {
-          if (imageData.data[(y * W + x) * 4 + 3] > 128) {
-            points.push({ x, y });
+      const { data } = oc.getImageData(0, 0, W, H);
+      const pts = [];
+
+      for (let row = 0; row < H; row += GAP) {
+        const xOff = ((row / GAP | 0) & 1) * (GAP * 0.5);
+        for (let col = xOff; col < W; col += GAP) {
+          const ix = Math.round(col);
+          const iy = Math.round(row);
+          if (ix < W && iy < H && data[(iy * W + ix) * 4 + 3] > 120) {
+            pts.push({ x: ix + rand(-0.35, 0.35), y: iy + rand(-0.35, 0.35) });
           }
         }
       }
-      return points;
+      return pts;
     }
 
-    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
-    function easeInOutQuart(t) {
-      return t < 0.5 ? 8 * t * t * t * t : 1 - Math.pow(-2 * t + 2, 4) / 2;
-    }
+    function buildParticles(targets) {
+      const spread = Math.max(W, H) * 0.82;
+      const mx = W / 2, my = H / 2;
+      const diagHalf = Math.hypot(mx, my);
 
-    function rand(min, max) { return min + Math.random() * (max - min); }
+      return targets.map(t => {
+        const a = Math.random() * Math.PI * 2;
+        const d = rand(spread * 0.32, spread);
 
-    function createParticles() {
-      const scatter = Math.max(W, H) * SCATTER_RADIUS_FACTOR;
-      particles = textTargets.map(target => {
-        const angle = Math.random() * Math.PI * 2;
-        const dist = rand(scatter * 0.35, scatter);
+        const tDist = Math.hypot(t.x - mx, t.y - my) / diagHalf;
+        const delay = rand(0, STAGGER * 0.55) + tDist * STAGGER * 0.45;
+
         return {
-          x: W / 2 + Math.cos(angle) * dist,
-          y: H / 2 + Math.sin(angle) * dist,
-          tx: target.x,
-          ty: target.y,
-          startX: 0,
-          startY: 0,
-          driftVx: rand(-0.3, 0.3),
-          driftVy: rand(-0.3, 0.3),
-          delay: rand(0, 0.35),
-          size: rand(PARTICLE_RADIUS * 0.7, PARTICLE_RADIUS * 1.3),
+          sx: mx + Math.cos(a) * d,
+          sy: my + Math.sin(a) * d,
+          tx: t.x,
+          ty: t.y,
+          delay,
+          sz: rand(DOT * 0.82, DOT * 1.18),
         };
       });
-      for (const p of particles) {
-        p.startX = p.x;
-        p.startY = p.y;
-      }
     }
 
     function init() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
-      W = Math.round(window.innerWidth);
-      H = Math.round(window.innerHeight);
-      canvas.width = W * dpr;
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width  = W * dpr;
       canvas.height = H * dpr;
-      canvas.style.width = W + 'px';
+      canvas.style.width  = W + 'px';
       canvas.style.height = H + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      textTargets = sampleText();
-      createParticles();
-      startTime = performance.now();
-      phase = 'drift';
+      particles = buildParticles(sampleTargets());
+      t0 = performance.now();
+      finished = false;
     }
 
-    function draw(now) {
-      const elapsed = now - startTime;
+    function frame(now) {
+      const elapsed = now - t0;
       ctx.clearRect(0, 0, W, H);
 
-      const [r, g, b] = PARTICLE_COLOR;
+      let running = false;
 
-      for (const p of particles) {
-        let x, y, alpha;
-        const particleElapsed = elapsed;
+      for (let i = 0, len = particles.length; i < len; i++) {
+        const p = particles[i];
+        const pStart   = p.delay * ANIM_MS;
+        const pElapsed = elapsed - pStart;
+        const pTotal   = ANIM_MS * (1 - p.delay * 0.7);
 
-        if (particleElapsed < DRIFT_DURATION) {
-          const t = Math.min(particleElapsed / DRIFT_DURATION, 1);
-          x = p.startX + p.driftVx * particleElapsed;
-          y = p.startY + p.driftVy * particleElapsed;
-          alpha = 0.08 + t * 0.22;
+        let t, alpha;
+
+        if (pElapsed <= 0) {
+          t = 0;
+          alpha = 0.055;
+          running = true;
         } else {
-          const cStart = DRIFT_DURATION + p.delay * CONVERGE_DURATION * 0.6;
-          const cElapsed = Math.max(0, particleElapsed - cStart);
-          const cTotal = CONVERGE_DURATION * (1 - p.delay * 0.4);
-          const rawT = Math.min(cElapsed / cTotal, 1);
-          const t = easeInOutQuart(rawT);
-
-          const driftEndX = p.startX + p.driftVx * DRIFT_DURATION;
-          const driftEndY = p.startY + p.driftVy * DRIFT_DURATION;
-
-          x = driftEndX + (p.tx - driftEndX) * t;
-          y = driftEndY + (p.ty - driftEndY) * t;
-
-          if (rawT < 1) {
-            const jitter = (1 - t) * 1.5;
-            x += Math.sin(now * 0.003 + p.delay * 40) * jitter;
-            y += Math.cos(now * 0.0025 + p.delay * 40) * jitter;
-          }
-
-          alpha = 0.30 + t * 0.70;
+          const raw = Math.min(pElapsed / pTotal, 1);
+          t = spring(raw);
+          alpha = Math.min(1, 0.055 + t * 0.945);
+          if (raw < 1) running = true;
         }
 
+        const x = p.sx + (p.tx - p.sx) * t;
+        const y = p.sy + (p.ty - p.sy) * t;
+
+        ctx.globalAlpha = alpha;
         ctx.beginPath();
-        ctx.arc(x, y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+        ctx.arc(x, y, p.sz, 0, 6.2832);
         ctx.fill();
       }
 
-      const totalDuration = DRIFT_DURATION + CONVERGE_DURATION + SETTLE_DURATION;
-      if (elapsed < totalDuration) {
-        requestAnimationFrame(draw);
-      } else {
+      ctx.globalAlpha = 1;
+
+      if (running) {
+        requestAnimationFrame(frame);
+      } else if (!finished) {
+        finished = true;
         ctx.clearRect(0, 0, W, H);
-        for (const p of particles) {
+        for (let i = 0, len = particles.length; i < len; i++) {
           ctx.beginPath();
-          ctx.arc(p.tx, p.ty, p.size, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(${r},${g},${b},1)`;
+          ctx.arc(particles[i].tx, particles[i].ty, particles[i].sz, 0, 6.2832);
           ctx.fill();
         }
       }
     }
 
+    ctx.fillStyle = `rgb(${R},${G},${B})`;
     init();
-    requestAnimationFrame(draw);
+    requestAnimationFrame(frame);
 
-    let resizeTimer;
+    let rTimer;
     window.addEventListener('resize', () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(() => { init(); requestAnimationFrame(draw); }, 200);
+      clearTimeout(rTimer);
+      rTimer = setTimeout(() => {
+        init();
+        ctx.fillStyle = `rgb(${R},${G},${B})`;
+        requestAnimationFrame(frame);
+      }, 200);
     });
   })();
   </script>
