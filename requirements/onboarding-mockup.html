@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onboarding Sequence Mockup</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .phone-frame {
+            background: white;
+            border-radius: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            aspect-ratio: 9/19;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 40px 30px;
+            background: white;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Screen 1: Welcome */
+        .screen-1 {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .welcome-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            font-size: 60px;
+        }
+
+        .screen-1 h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .screen-1 p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Screen 2: Sign Up */
+        .screen-2 {
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .screen-2 h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .screen-2 > p {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Screen 3: Profile */
+        .screen-3 {
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+
+        .avatar-uploader {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar::after {
+            content: '+';
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .screen-3 h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .screen-3 > p {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Screen 4: Permissions */
+        .screen-4 {
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+
+        .screen-4 h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .screen-4 > p {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .permission-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .permission-item:hover {
+            background: #efefef;
+        }
+
+        .permission-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+
+        .permission-text h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .permission-text p {
+            font-size: 13px;
+            color: #999;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            position: relative;
+            margin-left: auto;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+
+        .toggle.active {
+            background: #667eea;
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            width: 26px;
+            height: 26px;
+            background: white;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: left 0.3s;
+        }
+
+        .toggle.active::after {
+            left: 22px;
+        }
+
+        /* Screen 5: Tips */
+        .screen-5 {
+            justify-content: flex-start;
+            padding-top: 30px;
+        }
+
+        .screen-5 h1 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .screen-5 > p {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .tip-item {
+            padding: 20px;
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tip-item h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .tip-item p {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* Screen 6: Complete */
+        .screen-6 {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .complete-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            font-size: 60px;
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .screen-6 h1 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .screen-6 p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            padding: 0 30px 30px;
+            margin-top: auto;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Progress indicator */
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            padding: 20px 0;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #667eea;
+            width: 24px;
+            border-radius: 4px;
+        }
+
+        .dot:hover {
+            background: #ccc;
+        }
+
+        .screen-title {
+            color: #666;
+            font-size: 12px;
+            text-align: center;
+            padding-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="phone-frame">
+            <div class="status-bar">
+                <span>9:41</span>
+                <span>●●●●●</span>
+            </div>
+
+            <!-- Screen 1: Welcome -->
+            <div class="screen screen-1 active">
+                <div class="welcome-icon">👋</div>
+                <h1>Welcome!</h1>
+                <p>Get started on your journey in just a few minutes</p>
+            </div>
+
+            <!-- Screen 2: Sign Up -->
+            <div class="screen screen-2">
+                <h1>Create Account</h1>
+                <p>Sign up to get started</p>
+                <form>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" placeholder="••••••••">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Screen 3: Profile -->
+            <div class="screen screen-3">
+                <h1>Set Up Profile</h1>
+                <p>Tell us about yourself</p>
+                <div class="avatar-uploader">
+                    <div class="avatar">👤</div>
+                </div>
+                <form>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <input type="text" placeholder="Tell us about yourself...">
+                    </div>
+                </form>
+            </div>
+
+            <!-- Screen 4: Permissions -->
+            <div class="screen screen-4">
+                <h1>Permissions</h1>
+                <p>Enable features you'd like to use</p>
+
+                <div class="permission-item" onclick="togglePermission(this)">
+                    <div class="permission-icon">🔔</div>
+                    <div class="permission-text">
+                        <h3>Notifications</h3>
+                        <p>Get important updates</p>
+                    </div>
+                    <div class="toggle active"></div>
+                </div>
+
+                <div class="permission-item" onclick="togglePermission(this)">
+                    <div class="permission-icon">📱</div>
+                    <div class="permission-text">
+                        <h3>Contacts</h3>
+                        <p>Find friends</p>
+                    </div>
+                    <div class="toggle"></div>
+                </div>
+
+                <div class="permission-item" onclick="togglePermission(this)">
+                    <div class="permission-icon">📍</div>
+                    <div class="permission-text">
+                        <h3>Location</h3>
+                        <p>Personalize experience</p>
+                    </div>
+                    <div class="toggle"></div>
+                </div>
+            </div>
+
+            <!-- Screen 5: Tips -->
+            <div class="screen screen-5">
+                <h1>Pro Tips</h1>
+                <p>Make the most of the app</p>
+
+                <div class="tip-item">
+                    <h3>💡 Customize your preferences</h3>
+                    <p>Visit settings to personalize your experience</p>
+                </div>
+
+                <div class="tip-item">
+                    <h3>🔍 Explore features</h3>
+                    <p>Check out all features in the menu</p>
+                </div>
+
+                <div class="tip-item">
+                    <h3>❓ Need help?</h3>
+                    <p>Visit our help center for detailed guides</p>
+                </div>
+            </div>
+
+            <!-- Screen 6: Complete -->
+            <div class="screen screen-6">
+                <div class="complete-icon">✨</div>
+                <h1>You're All Set!</h1>
+                <p>Ready to explore and enjoy your new experience</p>
+            </div>
+
+            <!-- Progress Indicator -->
+            <div class="progress-dots">
+                <div class="dot active" onclick="goToScreen(0)"></div>
+                <div class="dot" onclick="goToScreen(1)"></div>
+                <div class="dot" onclick="goToScreen(2)"></div>
+                <div class="dot" onclick="goToScreen(3)"></div>
+                <div class="dot" onclick="goToScreen(4)"></div>
+                <div class="dot" onclick="goToScreen(5)"></div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="nav-buttons">
+                <button class="btn btn-secondary" onclick="previousScreen()">Back</button>
+                <button class="btn btn-primary" onclick="nextScreen()">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScreen = 0;
+        const totalScreens = 6;
+
+        function goToScreen(screenIndex) {
+            currentScreen = screenIndex;
+            updateScreenDisplay();
+        }
+
+        function nextScreen() {
+            if (currentScreen < totalScreens - 1) {
+                currentScreen++;
+                updateScreenDisplay();
+            }
+        }
+
+        function previousScreen() {
+            if (currentScreen > 0) {
+                currentScreen--;
+                updateScreenDisplay();
+            }
+        }
+
+        function updateScreenDisplay() {
+            // Update screens
+            document.querySelectorAll('.screen').forEach((screen, index) => {
+                screen.classList.remove('active');
+                if (index === currentScreen) {
+                    screen.classList.add('active');
+                }
+            });
+
+            // Update progress dots
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.remove('active');
+                if (index === currentScreen) {
+                    dot.classList.add('active');
+                }
+            });
+
+            // Update button visibility
+            const backBtn = document.querySelector('.btn-secondary');
+            const nextBtn = document.querySelector('.btn-primary');
+
+            if (currentScreen === 0) {
+                backBtn.style.display = 'none';
+                nextBtn.textContent = 'Get Started';
+            } else if (currentScreen === totalScreens - 1) {
+                backBtn.style.display = 'block';
+                nextBtn.textContent = 'Done';
+            } else {
+                backBtn.style.display = 'block';
+                nextBtn.textContent = 'Next';
+            }
+        }
+
+        function togglePermission(element) {
+            const toggle = element.querySelector('.toggle');
+            toggle.classList.toggle('active');
+        }
+
+        // Initialize
+        updateScreenDisplay();
+    </script>
+</body>
+</html>

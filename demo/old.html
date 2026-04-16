@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Model Viewer - Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0f0f1a;
+    }
+
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      background: #1a1a2e;
+      border-bottom: 1px solid #2d2d44;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #e6e6e6;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #16213e;
+      border: 1px solid #2d2d44;
+      border-radius: 6px;
+      color: #e6e6e6;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn:hover {
+      background: #1e2a4a;
+      border-color: #3d3d5c;
+    }
+
+    .btn-primary {
+      background: #00a8ff;
+      border-color: #00a8ff;
+    }
+
+    .btn-primary:hover {
+      background: #0090dd;
+      border-color: #0090dd;
+    }
+
+    .btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    #viewer-container {
+      flex: 1;
+      position: relative;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    /* Welcome overlay */
+    .welcome-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 15, 26, 0.95);
+      z-index: 200;
+    }
+
+    .welcome-overlay.hidden {
+      display: none;
+    }
+
+    .welcome-content {
+      text-align: center;
+      max-width: 500px;
+      padding: 40px;
+    }
+
+    .welcome-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+      color: #00a8ff;
+    }
+
+    .welcome-title {
+      font-size: 24px;
+      font-weight: 600;
+      color: #e6e6e6;
+      margin-bottom: 12px;
+    }
+
+    .welcome-text {
+      font-size: 14px;
+      color: #a0a0a0;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .drop-zone {
+      border: 2px dashed #3d3d5c;
+      border-radius: 12px;
+      padding: 40px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.dragover {
+      border-color: #00a8ff;
+      background: rgba(0, 168, 255, 0.05);
+    }
+
+    .drop-zone-text {
+      color: #a0a0a0;
+      font-size: 14px;
+    }
+
+    .drop-zone-text strong {
+      color: #00a8ff;
+    }
+
+    .sample-models {
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid #2d2d44;
+    }
+
+    .sample-models-title {
+      font-size: 12px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+
+    .sample-model-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      margin: 4px;
+      background: #1e1e2e;
+      border: 1px solid #2d2d44;
+      border-radius: 6px;
+      color: #a0a0a0;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .sample-model-btn:hover {
+      background: #2d2d44;
+      color: #e6e6e6;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <h1>3D Model Viewer</h1>
+      <div class="header-actions">
+        <button class="btn" id="btn-load">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Load IFC
+        </button>
+        <button class="btn" id="btn-export">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Export State
+        </button>
+      </div>
+    </header>
+
+    <div id="viewer-container">
+      <div class="welcome-overlay" id="welcome">
+        <div class="welcome-content">
+          <svg class="welcome-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+            <line x1="12" y1="22.08" x2="12" y2="12"/>
+          </svg>
+          <h2 class="welcome-title">3D IFC Model Viewer</h2>
+          <p class="welcome-text">
+            Load and explore IFC building models in 3D. Navigate with orbit controls,
+            select elements, control visibility, and more.
+          </p>
+          <div class="drop-zone" id="drop-zone">
+            <p class="drop-zone-text">
+              <strong>Drop IFC file here</strong> or click to browse
+            </p>
+          </div>
+          <div class="sample-models">
+            <p class="sample-models-title">Or try a sample model</p>
+            <button class="sample-model-btn" data-url="/models/Condos.ifc">
+              Condos Building
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <input type="file" class="file-input" id="file-input" accept=".ifc">
+  </div>
+
+  <script type="module">
+    import { ModelViewer, LeftSidebar } from '../src/index.js';
+    import { SearchSets } from '../src/features/SearchSets.js';
+    import { SearchSetsPanel } from '../src/ui/SearchSetsPanel.js';
+
+    // Initialize viewer
+    const viewer = new ModelViewer('#viewer-container', {
+      showToolbar: true,
+      showStatusBar: true,
+      showGrid: true
+    });
+
+    // DOM elements
+    const welcome = document.getElementById('welcome');
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const btnLoad = document.getElementById('btn-load');
+    const btnExport = document.getElementById('btn-export');
+
+    // File loading
+    async function loadFile(file) {
+      welcome.classList.add('hidden');
+      try {
+        await viewer.loadModelFromFile(file, file.name);
+        console.log('Model loaded:', file.name);
+      } catch (error) {
+        console.error('Error loading model:', error);
+        alert('Failed to load model: ' + error.message);
+        welcome.classList.remove('hidden');
+      }
+    }
+
+    async function loadUrl(url) {
+      welcome.classList.add('hidden');
+      try {
+        const name = url.split('/').pop();
+        await viewer.loadModel(url, name);
+        console.log('Model loaded:', name);
+      } catch (error) {
+        console.error('Error loading model:', error);
+        alert('Failed to load model: ' + error.message);
+        welcome.classList.remove('hidden');
+      }
+    }
+
+    // Drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.name.endsWith('.ifc')) {
+        loadFile(file);
+      } else {
+        alert('Please drop an IFC file');
+      }
+    });
+
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // File input
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        loadFile(file);
+      }
+    });
+
+    btnLoad.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Sample models
+    document.querySelectorAll('.sample-model-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        loadUrl(btn.dataset.url);
+      });
+    });
+
+    // Export state
+    btnExport.addEventListener('click', () => {
+      const state = viewer.getState();
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'viewer-state.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Viewer events
+    viewer.on('ready', () => {
+      console.log('Viewer ready');
+
+      // Initialize SearchSets feature + panel
+      const searchSets = new SearchSets(viewer.sceneManager, {
+        ifcLoader: viewer.ifcLoader,
+        selection: viewer.selection,
+        sectioning: viewer.sectioning,
+      });
+      searchSets.enable();
+      viewer.searchSets = searchSets;
+
+      const searchSetsPanel = new SearchSetsPanel(
+        document.querySelector('#viewer-container'),
+        searchSets
+      );
+      viewer.searchSetsPanel = searchSetsPanel;
+
+      // Create left sidebar toolbar
+      const sidebar = new LeftSidebar(
+        document.querySelector('#viewer-container'),
+        viewer
+      );
+      sidebar.syncSearchSetsPanelState();
+      window.sidebar = sidebar;
+    });
+
+    viewer.on('selection-change', (data) => {
+      console.log('Selection changed:', data);
+    });
+
+    viewer.on('element-click', (data) => {
+      console.log('Element clicked:', data);
+    });
+
+    viewer.on('load-error', (data) => {
+      console.error('Load error:', data);
+    });
+
+    // Make viewer available globally for debugging
+    window.viewer = viewer;
+  </script>
+</body>
+</html>

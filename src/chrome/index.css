@@ -1,0 +1,580 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.mv-toolbar-tooltip {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 4px 8px;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  background: #e0e3e5;
+  color: #232729;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.24);
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 60;
+}
+
+.mv-toolbar-button:hover .mv-toolbar-tooltip {
+  background: #ffffff;
+}
+
+.mv-toolbar-tooltip-right {
+  left: calc(100% + 12px);
+}
+
+.mv-toolbar-tooltip-left {
+  right: calc(100% + 12px);
+}
+
+.mv-toolbar-tooltip-label {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+
+.mv-toolbar-tooltip-shortcut {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  height: 16px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 2px;
+  background: #c1cbd0;
+  color: #232729;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+/* Override dark-theme.css when running in Chrome mode.
+   dark-theme.css is a side-effect import in ModelViewer.js —
+   these overrides only load on the Chrome page. */
+.model-viewer {
+  position: absolute !important;
+  inset: 0 !important;
+  background: transparent !important;
+}
+
+/* Hide dark-theme UI elements that Chrome replaces */
+.mv-toolbar,
+.mv-status-bar,
+.mv-left-sidebar {
+  display: none !important;
+}
+
+/* Keep engine-rendered panels (tree panel, context menu) visible
+   but re-theme them for the light UI */
+.mv-context-menu {
+  background: white !important;
+  border-color: #e5e7eb !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+
+.mv-context-menu-item {
+  color: #374151 !important;
+}
+
+.mv-context-menu-item:hover {
+  background: #f3f4f6 !important;
+}
+
+.mv-context-menu-item svg {
+  color: #6b7280 !important;
+}
+
+.mv-context-menu-chevron {
+  color: #111827 !important;
+}
+
+/* Light-theme and position the tree panel to match the Search Sets panel */
+.mv-panel {
+  /* Override dark-theme CSS variables at the panel scope */
+  --mv-text-primary: #374151;
+  --mv-text-secondary: #6b7280;
+  --mv-text-muted: #9ca3af;
+  --mv-bg-panel: white;
+  --mv-bg-secondary: white;
+  --mv-bg-hover: #f9fafb;
+  --mv-bg-active: #f3f4f6;
+  --mv-border: #e5e7eb;
+  --mv-border-light: #f3f4f6;
+  --mv-accent-light: #eff6ff;
+
+  background: white !important;
+  border-color: #e5e7eb !important;
+  color: #374151 !important;
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2) !important;
+  border-radius: 8px !important;
+}
+
+.mv-tree-panel {
+  top: 16px !important;
+  left: 64px !important;
+  width: 380px !important;
+}
+
+.mv-panel-header {
+  padding: 20px !important;
+  font-size: 20px !important;
+  font-weight: 700 !important;
+  color: #111827 !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  background: white !important;
+}
+
+.mv-panel-header button {
+  color: #9ca3af !important;
+  border-radius: 4px !important;
+}
+
+.mv-panel-header button:hover {
+  color: #4b5563 !important;
+  background: #f3f4f6 !important;
+}
+
+/* Hide expand/collapse buttons — not in the reference design */
+.mv-tree-expand-all,
+.mv-tree-collapse-all {
+  display: none !important;
+}
+
+.mv-panel-content {
+  padding: 0 !important;
+}
+
+/* Search bar: bordered input, icon on the right */
+.mv-tree-search {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  margin: 12px 16px !important;
+  padding: 0 !important;
+  border: 1.5px solid #d1d5db !important;
+  border-radius: 8px !important;
+  background: white !important;
+  gap: 0 !important;
+}
+
+.mv-tree-search input {
+  flex: 1 !important;
+  border: none !important;
+  background: transparent !important;
+  padding: 10px 36px 10px 14px !important;
+  font-size: 14px !important;
+  color: #374151 !important;
+  outline: none !important;
+  order: 1 !important;
+}
+
+.mv-tree-search input::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Move search icon to the right */
+.mv-tree-search > svg {
+  order: 2 !important;
+  position: absolute !important;
+  right: 12px !important;
+  width: 18px !important;
+  height: 18px !important;
+  color: #9ca3af !important;
+  pointer-events: none !important;
+}
+
+.mv-tree-search-clear {
+  order: 3 !important;
+  position: absolute !important;
+  right: 10px !important;
+}
+
+/* Tree rows */
+.mv-tree-node-row {
+  padding: 13px 16px !important;
+  font-size: 15px !important;
+  color: #111827 !important;
+  border-bottom: 1px solid #f3f4f6 !important;
+  gap: 8px !important;
+}
+
+.mv-tree-node-row:hover {
+  background: #f9fafb !important;
+}
+
+.mv-tree-node-row.selected {
+  background: #eff6ff !important;
+}
+
+.mv-tree-node-row.hidden-element .mv-tree-label {
+  color: #9ca3af !important;
+  text-decoration: line-through !important;
+}
+
+/* Checkbox */
+.mv-tree-checkbox {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  border: 2px solid #d1d5db !important;
+  border-radius: 3px !important;
+  background: white !important;
+  flex-shrink: 0 !important;
+}
+
+.mv-tree-checkbox .mv-tree-checkbox-icon {
+  display: none !important;
+  color: white !important;
+}
+
+.selected .mv-tree-checkbox {
+  background: #2563eb !important;
+  border-color: #2563eb !important;
+}
+
+.selected .mv-tree-checkbox .mv-tree-checkbox-icon {
+  display: block !important;
+}
+
+/* Toggle chevron */
+.mv-tree-toggle {
+  color: #6b7280 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Node icons: dark, visible only on branch nodes */
+.mv-tree-icon {
+  color: #111827 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.mv-tree-leaf .mv-tree-icon {
+  display: none !important;
+}
+
+.mv-tree-leaf .mv-tree-toggle {
+  visibility: hidden !important;
+}
+
+/* Visibility eye button */
+.mv-tree-visibility {
+  color: #9ca3af !important;
+  opacity: 0 !important;
+  transition: opacity 0.15s !important;
+}
+
+.mv-tree-node-row:hover .mv-tree-visibility,
+.mv-tree-node-row.hidden-element .mv-tree-visibility {
+  opacity: 1 !important;
+}
+
+.mv-tree-node-row.hidden-element .mv-tree-visibility {
+  color: #9ca3af !important;
+}
+
+/* Label */
+.mv-tree-label {
+  font-size: 15px !important;
+  color: #111827 !important;
+}
+
+.selected .mv-tree-label {
+  color: #1d4ed8 !important;
+}
+
+/* Children indentation */
+.mv-tree-children {
+  padding-left: 28px !important;
+}
+
+/* Light-theme the loading overlay */
+.mv-loading {
+  background: rgba(255,255,255,0.9) !important;
+  color: #374151 !important;
+}
+
+.mv-top-loading-bar {
+  position: relative;
+  width: 100%;
+  height: 0;
+  z-index: 40;
+  cursor: default;
+}
+
+.mv-top-loading-bar-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #e5e7eb;
+}
+
+.mv-top-loading-bar::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 100%;
+  height: 12px;
+}
+
+.mv-top-loading-bar-fill {
+  height: 100%;
+  background: #2563eb;
+  transition: width 180ms ease;
+}
+
+.mv-top-loading-popover {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.mv-top-loading-popover-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.mv-top-loading-popover.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.mv-top-loading-popover-label {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  letter-spacing: 0.15px;
+  color: #232729;
+}
+
+.mv-top-loading-popover-percent {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.15px;
+  color: #6B7280;
+}
+
+.mv-top-loading-popover-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  background: #E3E6E8;
+  color: #232729;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.25px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.mv-top-loading-popover-btn:hover {
+  background: #D6DADC;
+}
+
+.mv-nav-wheel {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 320px;
+  height: 220px;
+  z-index: 140;
+  --wheel-cx: 50%;
+  /* Center the orbit on the center of the blue docked semicircle. */
+  --wheel-cy: calc(100% - 3px);
+}
+
+.mv-nav-wheel-tooltip {
+  position: absolute;
+  left: 50%;
+  /* 24px above the top edge of orbit buttons, fixed centered spot */
+  top: calc(var(--wheel-cy) - 126px);
+  transform: translate(-50%, -100%);
+  min-width: 78px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.096);
+}
+
+.mv-nav-wheel-center {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 94px;
+  height: 50px;
+  border: none;
+  border-radius: 999px 999px 0 0;
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: inherit;
+  z-index: 3;
+}
+
+.mv-nav-wheel-center:hover {
+  background: #1d4ed8;
+}
+
+.mv-nav-wheel-center-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mv-nav-wheel-center-icon-image {
+  width: 24px;
+  height: 24px;
+  display: block;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  transform: translateY(8px);
+}
+
+.mv-nav-wheel-action {
+  position: absolute;
+  left: var(--wheel-cx);
+  top: var(--wheel-cy);
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transform: translate(-50%, -50%) scale(0.65);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 180ms ease, opacity 140ms ease;
+  z-index: 1;
+}
+
+.mv-nav-wheel-action.is-open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(
+      calc(-50% + var(--orbit-x, 0px)),
+      calc(-50% + var(--orbit-y, 0px))
+    )
+    scale(1);
+}
+
+.mv-nav-wheel-action:hover {
+  border-color: #d1d5db;
+  background: #f3f4f6;
+}
+
+.mv-nav-wheel-action.is-active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.mv-nav-wheel-action.is-active:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.mv-nav-wheel-action-icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.mv-nav-wheel-action.is-active .mv-nav-wheel-action-icon {
+  filter: brightness(0) invert(1);
+}
+
+.model-viewer.mv-cursor-select,
+.model-viewer.mv-cursor-select canvas {
+  cursor: default !important;
+}
+
+.model-viewer.mv-cursor-none,
+.model-viewer.mv-cursor-none canvas {
+  cursor: none !important;
+}
+
+.model-viewer.mv-cursor-orbit,
+.model-viewer.mv-cursor-orbit canvas {
+  cursor: url("./assets/cursors/orbit-cursor.svg") 10 10, grab !important;
+}
+
+.model-viewer.mv-cursor-fly,
+.model-viewer.mv-cursor-fly canvas {
+  cursor: url("./assets/cursors/fly-cursor.svg") 10 10, crosshair !important;
+}
+
+html.mv-force-selected-cursor,
+html.mv-force-selected-cursor * {
+  cursor: var(--mv-selected-cursor), auto !important;
+}
+
+@keyframes mv-skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+.mv-skeleton-pulse {
+  animation: mv-skeleton-pulse 1.5s ease-in-out infinite;
+}
