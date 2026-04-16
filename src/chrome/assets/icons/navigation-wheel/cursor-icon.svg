@@ -1,0 +1,10 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <g clip-path="url(#clip0_cursor_icon)">
+    <path d="M21.1007 9.89934L4.29891 4.29887L9.89938 21.1007L13.1 13.0999L21.1007 9.89934Z" fill="currentColor"/>
+  </g>
+  <defs>
+    <clipPath id="clip0_cursor_icon">
+      <rect width="24" height="24" fill="white"/>
+    </clipPath>
+  </defs>
+</svg>

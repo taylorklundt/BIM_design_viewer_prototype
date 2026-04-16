@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selection Test Page</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    #viewer-container { width: 100%; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="viewer-container"></div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { ModelViewer, LeftSidebar } from '../src/index.js';
+    import { SearchSets } from '../src/features/SearchSets.js';
+    import { SearchSetsPanel } from '../src/ui/SearchSetsPanel.js';
+
+    // Initialize viewer
+    const viewer = new ModelViewer('#viewer-container', {
+      showToolbar: true,
+      showStatusBar: true,
+      showGrid: true
+    });
+
+    // Create mock meshes for testing
+    function createMockScene() {
+      const scene = viewer.sceneManager.getScene();
+
+      // Create several colored boxes with property-set metadata
+      const colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff];
+      const names = ['Box 1', 'Box 2', 'Box 3', 'Box 4', 'Box 5'];
+      const types = ['TestBox', 'TestBox', 'TestWall', 'TestBox', 'TestWall'];
+      const levels = ['Level 1', 'Level 1', 'Level 2', 'Level 2', 'Level 3'];
+      const meshes = [];
+
+      for (let i = 0; i < 5; i++) {
+        const geometry = new THREE.BoxGeometry(2, 2, 2);
+        const material = new THREE.MeshStandardMaterial({ color: colors[i] });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        mesh.position.set((i - 2) * 4, 1, 0);
+        mesh.userData.expressID = `element-${i}`;
+        mesh.userData.name = names[i];
+        mesh.userData.type = types[i];
+        mesh.userData.level = levels[i];
+
+        mesh.userData.properties = {
+          Pset_Common: {
+            FireRating: i < 3 ? '2HR' : '1HR',
+            LoadBearing: i % 2 === 0 ? 'true' : 'false',
+          }
+        };
+
+        scene.add(mesh);
+        meshes.push(mesh);
+      }
+
+      // Zoom to fit
+      viewer.navigation.zoomToFit();
+
+      return meshes;
+    }
+
+    // Wait for viewer ready then create mock scene
+    viewer.on('ready', () => {
+      createMockScene();
+
+      // Initialize SearchSets feature + panel and attach to viewer
+      const searchSets = new SearchSets(viewer.sceneManager, {
+        selection: viewer.selection,
+        sectioning: viewer.sectioning,
+      });
+      searchSets.enable();
+      viewer.searchSets = searchSets;
+
+      const searchSetsPanel = new SearchSetsPanel(
+        document.querySelector('#viewer-container'),
+        searchSets
+      );
+      viewer.searchSetsPanel = searchSetsPanel;
+
+      // Create left sidebar toolbar
+      const sidebar = new LeftSidebar(
+        document.querySelector('#viewer-container'),
+        viewer
+      );
+      sidebar.syncSearchSetsPanelState();
+      window.sidebar = sidebar;
+
+      window.__sceneReady = true;
+      console.log('Mock scene ready');
+    });
+
+    // Expose viewer globally
+    window.viewer = viewer;
+    window.__sceneReady = false;
+  </script>
+</body>
+</html>

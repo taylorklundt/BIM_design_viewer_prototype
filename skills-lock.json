@@ -1,0 +1,330 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-readiness": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "696b222c387efeedd44ebb00e7a21150c946e7999fdeec787426913d474754b0"
+    },
+    "agents-md-best-practices": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "e73068b2641d5fc79613d2983a292146af23e90c0f9e118254e93504d571e42f"
+    },
+    "ai-coding-user-space": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "9c3f0a8deafd2d98d93752c934858815c144937f1e005e6e2ad2a694f96fd4c1"
+    },
+    "android-emulator-control": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "3fb1bcb770480837aca9295e95a46bf687210478288ba76a8289aa3f6fd2dccd"
+    },
+    "architecture-guidance": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "98a531b24848d997a077180cfef05117c3c289150fe95f660d8979325204c2d4"
+    },
+    "architecture-review": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "036556178fcbe94064fcf1712d3c1eb492ab0c73a4cfce6a421e7077929d95b5"
+    },
+    "argo-waves-migration": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "2c2d80791224ccc1d80b6419854d304099b3b98d443d59a0b644059dd3dfa932"
+    },
+    "argocd": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "bc41485304e7a969f88417c14ab4e4ef4b95bc9d0a95a26cc9d00b132a57ce27"
+    },
+    "backstage": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "eadf71cabbe2805a1d28aa9697a479eed3d32c61336ec51e32f7833c620b303b"
+    },
+    "bugsnag": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "43f89d93539335d79c62d90230d084b341470705100c4a202ed4ffcb9cdd574d"
+    },
+    "circleci": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "394a7f0ed7e552ce3ede4c26c6bf10724016b3810aa4bc3712e6f6a9b06635bd"
+    },
+    "code-review": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "e24b32e077211d5a89502426c72c9964e3c978acf2e125dd0269792780ac7915"
+    },
+    "confluence": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "bb408b3c7c45d89b68151574d7387560b1ffb68c7881fadb84f5482455814f6d"
+    },
+    "core-react": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "69419f165ea12d1c7907ad48b0e592869d1d2e3d1cd0fc39b58ced212a3c14d4"
+    },
+    "datadog": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "eb63e8009b72de8c755ae781c29db36379e20c13da49e036b6730c82bc472d6a"
+    },
+    "dependabot-config": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "f4a7b72918cdb636fe818a47a3ba33f204de4995cffe346e5b948aa32bdebb05"
+    },
+    "design-orchestrator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "381ae801d7f4d2b67be624780d0b9fefbf5965a505808fa01dc59aada9798be8"
+    },
+    "e2e-delivery": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "5a582492a99000e2c36c4bf2cb05b74ad5e0c6b3214cee9c1872b1813e002ac1"
+    },
+    "feature-orchestrator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "97448f0aa4ccafea46f62e0f727206289902ad1543494d05bbe6ba4b6c4899ac"
+    },
+    "fix-cve": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "2fb274ccfbd8d3bb3729f63fd1323296bfc95c46a23ad724ad5e174fdfe33dd5"
+    },
+    "gsd": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "fd2a77e95b6cf7435e7b6361aab762096e4c926da42110a6f8da03487af6ada2"
+    },
+    "honeycomb": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "39af6845bbc9450853fddd3bb32f87804e3c78ad3e737aeffe55db7fec1029e6"
+    },
+    "honeycomb-trace-analysis": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "def98c60bcde245f7a39e28fceeaa2c9dea22d11f83f11e82fb6c2c8137c9308"
+    },
+    "jira": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "6f0bd6ea9d28d49dfb9e7c53a19af354a13c67d1a668fca0d3f2eb6767e582d6"
+    },
+    "jira-builders": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "6e7134a07564cf7257bf5ec7946ea550a7e752d9bc00db1bc9b34ebe55ae0bf0"
+    },
+    "jira-service-desk": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "18081f52ba18e85550a365b8b61aa400504a0dc10ddfb21daeb241ddef552d89"
+    },
+    "js-dependency-updater": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "3bffd8f244b2a75991ecbaa8fbf4fce3e830c55544c50dbd7ae920c8bba81872"
+    },
+    "launch-darkly-cleanup": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "6295b1e8be165015383599931788a86222a539b31693e2b347b66d240cdf0c5f"
+    },
+    "learn": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "09a79b9ef23e79ee061b0bac704c0b69072007f61dc256b2d9379a3f6438e547"
+    },
+    "mobile-bug-fixer": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "d751bd72eeff882a5fa0ca44994fc221b4ee5c4ad7111fd76e1295f34711c701"
+    },
+    "node-package-manager": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "2e3b76db771629608f9a8212526ba4020d9e0996da8c4bf7f2b518a2959461f8"
+    },
+    "notebooklm": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "fa0fd73cc4b70cb41c9abb2e837d28fd556f42d60494de7b9cd1ad0efc323902"
+    },
+    "pm-orchestrator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "8539440fb1f83ace01aba1b2c5d9c64e9fb1677468354493fcb940ac825d896e"
+    },
+    "postgres": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "c5a6d09a05de7c6d5fdc3a131d496fba3020ecf050de06e819e6a09f13d66fc7"
+    },
+    "pr": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "0bc750b5cc8ba439939feb93f0c70cfd3e4addcf53bdea0fcde44de0295cb59b"
+    },
+    "pr-batch-review": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "8ae548937bc6fc56367554c11fabf36c6cb0f5284a7d2470c2da122121a07c68"
+    },
+    "pr-triage": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "f929eff91b81fa87777daee32fb1210acbb2ca27ec9cc48d334763f5b95a40e3"
+    },
+    "prd-generator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "ea186956a7ff28cbdaae0b71166e6fa2ce5edc64b73f6bd0dce402c3bf6b00cc"
+    },
+    "prd-interview": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "8e6be7ede7e5001531ecdf2375c1e2b18b73935e6a7bf99d92c7c87c053084a6"
+    },
+    "procore-api": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "a2b37f28cfdd35b298a8e01005d0206e81a76a6497d2083917f6ebd6f2e2a7c1"
+    },
+    "procore-design-system": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "c0e957345148aed9097fb10916ee37a5329b56440cc72a1be53170f48c0f3d2d"
+    },
+    "qa-e2e": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "5acefc51ff377b2a5b74cea937cc84cd14ce42b691a746ce6a8e4dad20dc858d"
+    },
+    "qa-test-case-generator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "d0cd761e0536f73232112f3d2428ecc7699f439c96eff56f8a7cad06f89ed310"
+    },
+    "repo-context-librarian": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "14a73227788383ce6acf780c4a96734cfc817a5b4b3d86833828b589817f7b2e"
+    },
+    "review-slos": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "ede1168c36099d8a53b8c4303b35d2dd5028443380c77e7dfbc428b62a3e4901"
+    },
+    "security-review": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "a6db03f6c225591581be197639dd4b043dec30e4a7e8385a48f444a265247812"
+    },
+    "sentry-cli": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "a9e2f0d21cef9865513200150e703dde2679bbba212652f8aefd115bfd600145"
+    },
+    "services-deployer": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "ff12f21ed4e84b17d3fd010a3dee1e8a925e2b744474853281e99fe1af729962"
+    },
+    "sherpa-deploy-to-staging": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "29b2e44606973bbb2cf249472ec341abcd177721d7e15c17679946002bf8637e"
+    },
+    "simplify-code": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "77b6efbca2169b98a045eb36b45e67007a72391f12ca04c59bd1bfae0ec84375"
+    },
+    "skill-catalog": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "98f5b5fe751a2bd407a852a4b350e430b5601999be9822a9a131beee8744a121"
+    },
+    "skill-creator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "7eba111c8e4b6d395fec805f8d700ab63afe13b3e8f9dab1dc448306b68b69ec"
+    },
+    "skill-documenter": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "b12c108bb60449c90a88facae5e2e5aae59ea88403a3fbd626272afc450de222"
+    },
+    "skill-enhancer": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "6e26b59eda223cef1c386cd7324f668d7bac90b3d47a02c59873aecaba7f1135"
+    },
+    "skill-evaluator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "bd2abaac769b34a900602646822896c0de3fbd1900b1cc32097720e652c234fb"
+    },
+    "skill-reviewer": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "1cf1d2d4a767dfb2d86b043d95272686f276bc7e2e433c8d5cc49a9ed1dbc262"
+    },
+    "skill-simplification": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "1ce0eaf5446ff9e1f96e9315bdad5ee5e544bcd492bdba6e4e11235e61b0fe19"
+    },
+    "skill-tester": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "4950a32dd8f08ae3608169dedd92cba3c34ef0c38adade6edf0b191dfe6268a2"
+    },
+    "skill-validator": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "88960f3a2a4a2c7c8ce9a56b08ce407d640798d46a9182be0843d3082795d677"
+    },
+    "sonarqube": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "856fed047354b2865d65e382afa3ea6a4d94f27cb867f3dd6a0516dd4dbfc743"
+    },
+    "tech-plan": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "1afe32ffb0cd8779197044e6a24f784b129aa556ddc5b1a5c5ffea5afa442dce"
+    },
+    "tugboat": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "6d83c63c644b1de268799d2695a5838b619bd8de01250560118a22c7bb99d13d"
+    },
+    "tugboat-builders": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "8ca185d27c90e3f39ac77e7e1680907356c5d3e7e40e95181c028e89b86cfd39"
+    },
+    "typescript": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "1de3384103a52f9fefbeded5b8e37a5517508a76511ffdfdb0c3fdf55cfe97e4"
+    },
+    "validate-hub-card-manifest": {
+      "source": "/tmp/ai-coding-skills",
+      "sourceType": "local",
+      "computedHash": "77550a932132f0fb6cf44e52b2a01d23568a6ad32b1973b66a8d224fc31c59ab"
+    }
+  }
+}
