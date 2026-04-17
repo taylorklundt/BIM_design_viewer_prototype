@@ -1176,10 +1176,10 @@ export class Sectioning {
     this.clearPlaneHoverMarker();
 
     const camDist = this.camera.position.distanceTo(point);
-    const radius = camDist * 0.02;
-    const strokeW = radius * 0.08;
+    const radius = camDist * 0.017;
+    const strokeW = radius * 0.16;
     const outerR = radius;
-    const innerR = outerR * 0.5;
+    const innerR = outerR * 0.36;
 
     const up = new THREE.Vector3(0, 1, 0);
     const tangent = new THREE.Vector3();
@@ -1231,7 +1231,7 @@ export class Sectioning {
       const sprite = new THREE.Sprite(spriteMat);
       sprite.userData.isPlaneHelper = true;
       sprite.renderOrder = 1010;
-      const spriteSize = outerR * 1.65;
+      const spriteSize = outerR * 1.4;
       sprite.scale.set(spriteSize, spriteSize, 1);
       sprite.position.set(0, 0, outerR * 1.2);
       group.add(sprite);
