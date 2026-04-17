@@ -500,6 +500,8 @@ export class Sectioning {
     this.dragStartPoint.copy(startPoint);
     this._dragCumulativeDistance = 0;
 
+    if (this._tiltGizmo) this._tiltGizmo.visible = false;
+
     const cameraDir = new THREE.Vector3();
     this.camera.getWorldDirection(cameraDir);
     this.dragPlane.setFromNormalAndCoplanarPoint(cameraDir, this.dragStartPoint);
@@ -1080,19 +1082,18 @@ export class Sectioning {
     const gizmo = new THREE.Group();
     gizmo.add(inner);
 
-    // Position — offset along normal so gizmo sits outside the cut surface
+    // Position — center on the cross-section centroid, offset along normal
+    const centroid = this._computeCrossSectionCentroid(planeData.plane) || planeData.point;
     const bounds = this.getSceneBounds();
     const bSize = new THREE.Vector3();
     bounds.getSize(bSize);
     const gizmoOffset = Math.max(bSize.x, bSize.y, bSize.z) * 0.03;
-    gizmo.position.copy(planeData.point)
+    gizmo.position.copy(centroid)
       .addScaledVector(planeData.normal, gizmoOffset);
 
-    // Orient — the gizmo's two visible rings (Ring_X in YZ, Ring_Y in XZ) intersect
-    // along the Z axis, forming the visual "cross". Map Z to the outward normal so
-    // the cross-point faces away from the cut.
-    const targetDir = planeData.normal.clone().normalize();
-    gizmo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), targetDir);
+    // Orient — copy the helper's full quaternion so the gizmo rings stay aligned
+    // with the actual tilt axes (no roll loss from setFromUnitVectors).
+    gizmo.quaternion.copy(planeData.helper.quaternion);
 
     // Initial camera-distance-based scale
     const dist = this.camera.position.distanceTo(planeData.point);
@@ -1108,6 +1109,19 @@ export class Sectioning {
 
     this._tiltCumulativeX = 0;
     this._tiltCumulativeY = 0;
+  }
+
+  _updateTiltGizmoPosition(planeId) {
+    if (!this._tiltGizmo) return;
+    const planeData = this.clipPlanes.get(planeId);
+    if (!planeData) return;
+    const centroid = this._computeCrossSectionCentroid(planeData.plane) || planeData.point;
+    const bounds = this.getSceneBounds();
+    const bSize = new THREE.Vector3();
+    bounds.getSize(bSize);
+    const gizmoOffset = Math.max(bSize.x, bSize.y, bSize.z) * 0.03;
+    this._tiltGizmo.position.copy(centroid)
+      .addScaledVector(planeData.normal, gizmoOffset);
   }
 
   _detachTiltGizmo() {
@@ -2853,9 +2867,8 @@ export class Sectioning {
           this.raycaster.ray.intersectPlane(this._tiltDragPlane, newPt);
           if (newPt) this._tiltDragStartDir = newPt.sub(this._tiltDragCenter).normalize();
 
-          // Sync the gizmo wrapper — map Z to the new outward normal
-          const newN = new THREE.Vector3(0, 0, 1).applyQuaternion(planeData.helper.quaternion).normalize();
-          this._tiltGizmo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), newN);
+          // Sync the gizmo wrapper to match the helper's full orientation
+          this._tiltGizmo.quaternion.copy(planeData.helper.quaternion);
 
           // Live-update the clipping plane and contour
           this._syncTiltToClipPlane(this.activeSectionPlaneId);
@@ -2935,6 +2948,7 @@ export class Sectioning {
         }
       }
       this._buildActivePlaneContour();
+      this._updateTiltGizmoPosition(this.dragPlaneId);
       this._setCursor('none');
       return;
     }
@@ -3125,25 +3139,28 @@ export class Sectioning {
               if (!pd) return;
               pd.helper.quaternion.copy(beforeQ);
               if (this._tiltGizmo) {
-                const n = new THREE.Vector3(0, 0, 1).applyQuaternion(beforeQ).normalize();
-                this._tiltGizmo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n);
+                this._tiltGizmo.quaternion.copy(beforeQ);
               }
               this._syncTiltToClipPlane(planeId);
+              this._updateTiltGizmoPosition(planeId);
             },
             redo: () => {
               const pd = this.clipPlanes.get(planeId);
               if (!pd) return;
               pd.helper.quaternion.copy(afterQ);
               if (this._tiltGizmo) {
-                const n = new THREE.Vector3(0, 0, 1).applyQuaternion(afterQ).normalize();
-                this._tiltGizmo.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n);
+                this._tiltGizmo.quaternion.copy(afterQ);
               }
               this._syncTiltToClipPlane(planeId);
+              this._updateTiltGizmoPosition(planeId);
             },
           });
         }
       }
       this._tiltBeforeQuat = null;
+      if (this.activeSectionPlaneId) {
+        this._updateTiltGizmoPosition(this.activeSectionPlaneId);
+      }
       this.emit('drag-end');
       return;
     }
