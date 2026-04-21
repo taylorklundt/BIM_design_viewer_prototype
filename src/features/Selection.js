@@ -15,8 +15,8 @@ export class Selection {
     this.hoverEnabled = true;
     this.selectionEnabled = true;
 
-    this.highlightColor = new THREE.Color(0x00a8ff);
-    this.hoverColor = new THREE.Color(0x66ccff);
+    this.highlightColor = new THREE.Color(0x2066df);
+
 
     this.originalMaterials = new Map();
     this._hoverMesh = null;
@@ -56,13 +56,7 @@ export class Selection {
       opacity: 0.9
     });
 
-    this.hoverMaterial = new THREE.MeshStandardMaterial({
-      color: this.hoverColor,
-      emissive: this.hoverColor,
-      emissiveIntensity: 0.25,
-      transparent: true,
-      opacity: 0.85
-    });
+    this.hoverLightnessBoost = 0.105;
   }
 
   setHoverEffectMode(mode) {
@@ -479,9 +473,27 @@ export class Selection {
       this.originalMaterials.set(mesh.uuid, mesh.material);
     }
 
-    mesh.material = this.hoverMaterial.clone();
+    const origColor = mesh.material.color || new THREE.Color(0xcccccc);
+    const hsl = {};
+    origColor.getHSL(hsl);
+
+    const lightenedColor = new THREE.Color().setHSL(
+      hsl.h,
+      hsl.s,
+      Math.min(hsl.l + this.hoverLightnessBoost, 0.95)
+    );
+
+    const hoverMat = new THREE.MeshStandardMaterial({
+      color: lightenedColor,
+      emissive: lightenedColor,
+      emissiveIntensity: 0.3,
+      transparent: true,
+      opacity: 0.9,
+    });
+
+    mesh.material = hoverMat;
     this._hoverMesh = mesh;
-    this._hoverMat = mesh.material;
+    this._hoverMat = hoverMat;
   }
 
   removeHover(mesh) {
