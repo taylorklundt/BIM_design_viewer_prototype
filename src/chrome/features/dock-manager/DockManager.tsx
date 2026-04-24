@@ -29,6 +29,7 @@ import {
   PANEL_REGISTRY,
   PropertiesContent,
   PropertiesToolbar,
+  OBJECT_TREE_BREADCRUMBS,
   type PropertiesTabId,
 } from './panelContent';
 import { useViewerAdapter } from '../viewer-adapter/ViewerAdapterContext';
@@ -150,6 +151,18 @@ export function DockManager({ store, deemphasized = false }: DockManagerProps) {
       { id: 'related-items', label: 'Related Items' },
     ];
   }, []);
+
+  const getPanelBreadcrumbs = useCallback((panelId: PanelId): string[] | undefined => {
+    if (panelId !== 'object-tree') return undefined;
+    return OBJECT_TREE_BREADCRUMBS;
+  }, []);
+
+  // Panels with card-like sectioned content (e.g. Properties) sit on a gray inset.
+  // All other panels bleed to the panel's white chrome edge-to-edge.
+  const getPanelContentVariant = useCallback(
+    (panelId: PanelId): 'bleed' | 'padded' => (panelId === 'properties' ? 'padded' : 'bleed'),
+    [],
+  );
 
   useEffect(() => {
     setObjectEntries(adapter.getObjectList?.() ?? []);
@@ -610,6 +623,8 @@ export function DockManager({ store, deemphasized = false }: DockManagerProps) {
                   deemphasized={deemphasized}
                   toolbar={toolbarNode}
                   tabs={getPanelTabs(panel.id)}
+                  breadcrumbs={getPanelBreadcrumbs(panel.id)}
+                  contentVariant={getPanelContentVariant(panel.id)}
                   activeTabId={panel.id === 'properties' ? propertiesTab : undefined}
                   onTabChange={panel.id === 'properties'
                     ? ((tabId) => setPropertiesTab(tabId as PropertiesTabId))
@@ -684,6 +699,8 @@ export function DockManager({ store, deemphasized = false }: DockManagerProps) {
               isLifted
               toolbar={toolbarNode}
               tabs={getPanelTabs(panel.id)}
+              breadcrumbs={getPanelBreadcrumbs(panel.id)}
+              contentVariant={getPanelContentVariant(panel.id)}
               activeTabId={panel.id === 'properties' ? propertiesTab : undefined}
               onTabChange={panel.id === 'properties'
                 ? ((tabId) => setPropertiesTab(tabId as PropertiesTabId))
@@ -732,6 +749,8 @@ export function DockManager({ store, deemphasized = false }: DockManagerProps) {
             floatWidth={panel.floatWidth}
             toolbar={toolbarNode}
             tabs={getPanelTabs(panel.id)}
+            breadcrumbs={getPanelBreadcrumbs(panel.id)}
+            contentVariant={getPanelContentVariant(panel.id)}
             activeTabId={panel.id === 'properties' ? propertiesTab : undefined}
             onTabChange={panel.id === 'properties'
               ? ((tabId) => setPropertiesTab(tabId as PropertiesTabId))
@@ -775,6 +794,8 @@ export function DockManager({ store, deemphasized = false }: DockManagerProps) {
               isDetached
               toolbar={toolbarNode}
               tabs={getPanelTabs(panel.id)}
+              breadcrumbs={getPanelBreadcrumbs(panel.id)}
+              contentVariant={getPanelContentVariant(panel.id)}
               activeTabId={panel.id === 'properties' ? propertiesTab : undefined}
               onTabChange={panel.id === 'properties'
                 ? ((tabId) => setPropertiesTab(tabId as PropertiesTabId))

@@ -1,4 +1,5 @@
 import { useRef, useCallback, useEffect, useState } from 'react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import type { PanelId } from './useDockStore';
 import minimizeIcon from '../../assets/icons/panel/minimize.svg';
 import expandIcon from '../../assets/icons/panel/expand.svg';
@@ -20,6 +21,17 @@ interface DockedPanelProps {
   tabs?: Array<{ id: string; label: string }>;
   activeTabId?: string;
   onTabChange?: (tabId: string) => void;
+  breadcrumbs?: string[];
+  /** When provided, renders an ArrowLeft button at the start of the heading row and indents the subheading. */
+  onBack?(): void;
+  /** Optional footer slot (rendered below the content area). */
+  footer?: React.ReactNode;
+  /**
+   * Content area surface treatment.
+   * - 'bleed' (default): children render edge-to-edge on white. Use for list/tree panels.
+   * - 'padded': children sit on a 16px gray inset (#F4F5F6). Use when children are discrete card-like groupings (e.g. Properties).
+   */
+  contentVariant?: 'bleed' | 'padded';
   children: React.ReactNode;
   onClose(): void;
   onToggleMinimize(): void;
@@ -53,6 +65,10 @@ export function DockedPanel({
   tabs,
   activeTabId,
   onTabChange,
+  breadcrumbs,
+  onBack,
+  footer,
+  contentVariant = 'bleed',
   children,
   onClose,
   onToggleMinimize,
@@ -80,7 +96,7 @@ export function DockedPanel({
   } | null>(null);
   const panelRootRef = useRef<HTMLDivElement>(null);
 
-  const RESTING_SHADOW = '0 1px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06)';
+  const RESTING_SHADOW = '0 0 4px 0 rgba(0,0,0,0.25)';
   const FLOATING_SHADOW = '0 0 20px 0 rgba(0,0,0,0.2)';
   const LIFTED_SHADOW = '0 0 20px 0 rgba(0,0,0,0.2), 0 12px 32px rgba(0,0,0,0.22)';
   const boxShadow = isLifted ? LIFTED_SHADOW : (docked ? RESTING_SHADOW : FLOATING_SHADOW);
@@ -180,24 +196,37 @@ export function DockedPanel({
       ref={panelRootRef}
       data-panel-root
       style={containerStyle}
-      className={`relative flex flex-col bg-white overflow-hidden select-none ${isDetached ? '' : 'rounded-xl border border-[#d5d7da]'}`}
+      className={`relative flex flex-col bg-white overflow-hidden select-none ${isDetached ? '' : 'rounded-lg'}`}
     >
       {/* Header — grabbing here triggers the drag */}
       <div
-        className={`flex items-start justify-between px-4 pt-4 ${minimized ? 'pb-4' : 'pb-2'} bg-white ${isDetached ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'} shrink-0 ${
+        className={`flex items-start justify-between px-4 pt-4 pb-4 bg-white ${isDetached ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'} shrink-0 ${
           minimized || hasTabs ? '' : 'border-b border-[#e5e7eb]'
         }`}
         onPointerDown={isDetached ? undefined : onDragStart}
       >
-        <div className="min-w-0">
+        <div className="min-w-0 flex flex-col gap-1">
+          <div className="flex items-start gap-2 min-w-0">
+            {onBack && (
+              <button
+                type="button"
+                onClick={onBack}
+                aria-label="Back"
+                onPointerDown={(e) => e.stopPropagation()}
+                className="shrink-0 w-6 h-6 flex items-center justify-center rounded hover:bg-black/5"
+              >
+                <ArrowLeft size={16} className="text-[#232729]" />
+              </button>
+            )}
+            <span className="block text-[16px] leading-[24px] tracking-[0.15px] font-semibold text-[#232729] truncate min-w-0 flex-1">
+              {title}
+            </span>
+          </div>
           {!minimized && subheader && (
-            <div className="text-[12px] leading-[16px] tracking-[0.25px] font-semibold text-[#6B7785] truncate">
+            <div className={`text-[14px] leading-[20px] tracking-[0.15px] font-normal text-[#6A767C] truncate ${onBack ? 'pl-8' : ''}`}>
               {subheader}
             </div>
           )}
-          <span className={`block text-[16px] leading-[24px] tracking-[0.15px] font-semibold text-gray-800 truncate ${!minimized && subheader ? 'mt-1' : ''}`}>
-            {title}
-          </span>
         </div>
 
         <div
@@ -279,7 +308,7 @@ export function DockedPanel({
 
       {/* Optional toolbar (search bar, filters, etc.) */}
       {hasTabs && (
-        <div className="mt-4 border-b border-[#e5e7eb] px-4">
+        <div className="border-b border-[#e5e7eb] px-4">
           <div className="flex items-end gap-6">
             {tabs.map((tab) => {
               const isActive = tab.id === activeTabId;
@@ -293,11 +322,12 @@ export function DockedPanel({
                   }`}
                 >
                   {tab.label}
-                  <span
-                    className={`absolute left-0 right-0 -bottom-[1px] h-[3px] bg-black transition-opacity duration-150 ${
-                      isActive ? 'opacity-100' : 'opacity-0'
-                    }`}
-                  />
+                  {isActive && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute left-0 right-0 -bottom-[1px] h-[4px] bg-black"
+                    />
+                  )}
                 </button>
               );
             })}
@@ -309,10 +339,39 @@ export function DockedPanel({
         <div className="shrink-0">{toolbar}</div>
       )}
 
+      {!minimized && breadcrumbs && breadcrumbs.length > 0 && (
+        <div className="flex items-center gap-1 px-4 py-2 bg-white text-[14px] leading-[20px] tracking-[0.15px] overflow-hidden border-b border-[#dcdcdc] shrink-0">
+          {breadcrumbs.map((crumb, i) => (
+            <span key={`${crumb}-${i}`} className="flex items-center gap-1 shrink-0 min-w-0">
+              {i > 0 && <ChevronRight size={12} className="text-[#6A767C] shrink-0" />}
+              <span
+                className={`truncate ${
+                  i === breadcrumbs.length - 1
+                    ? 'font-semibold text-[#232729]'
+                    : 'text-[#6A767C] hover:underline cursor-pointer'
+                }`}
+              >
+                {crumb}
+              </span>
+            </span>
+          ))}
+        </div>
+      )}
+
       {/* Content */}
       {!minimized && (
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <div
+          className={`flex-1 overflow-y-auto min-h-0 ${
+            contentVariant === 'padded' ? 'bg-[#F4F5F6] p-4' : 'bg-white'
+          }`}
+        >
           {children}
+        </div>
+      )}
+
+      {!minimized && footer && (
+        <div className="flex items-center justify-between gap-2 bg-white px-4 py-2 shadow-[0_-1px_0_#dcdcdc] shrink-0">
+          {footer}
         </div>
       )}
 

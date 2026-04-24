@@ -10,6 +10,7 @@ import {
   Wrench,
   ChevronRight,
   ChevronDown,
+  Check,
   Folder,
   Star,
 } from 'lucide-react';
@@ -25,21 +26,33 @@ function PanelSearchBar({
   value,
   onChange,
   placeholder,
+  onFilter,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
+  onFilter?: () => void;
 }) {
   return (
-    <div className="flex items-center w-full h-7 rounded-md border border-[#ECEFF1] bg-[#F5F7F8] px-2">
+    <div className="flex items-center w-full h-7 rounded bg-[#EEF0F1] pl-3 pr-2 gap-1">
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 bg-transparent text-sm text-[#111827] placeholder-[#6B7785] outline-none"
+        className="flex-1 min-w-0 bg-transparent text-sm text-[#111827] placeholder-[#6B7785] outline-none"
       />
       <img src={searchFieldIcon} alt="" width={24} height={24} className="shrink-0" />
+      {onFilter && (
+        <button
+          type="button"
+          aria-label="Filter"
+          onClick={onFilter}
+          className="w-6 h-6 flex items-center justify-center rounded shrink-0 hover:bg-black/5"
+        >
+          <img src={filterButtonIcon} alt="" width={16} height={16} />
+        </button>
+      )}
     </div>
   );
 }
@@ -67,7 +80,7 @@ function SearchSetsContent() {
   }
 
   return (
-    <ul>
+    <ul className="bg-white rounded-md overflow-hidden">
       {searchSets.map((set) => (
         <li
           key={set.id}
@@ -110,7 +123,7 @@ const ITEMS = [
 
 function ItemsContent() {
   return (
-    <ul className="px-2 py-1">
+    <ul className="bg-white rounded-md overflow-hidden px-2 py-1">
       {ITEMS.map(({ label, Icon }) => (
         <li key={label}>
           <button
@@ -164,7 +177,7 @@ const DEMO_OBJECT_TREE: ObjNode[] = [
   { id: 'civil', label: 'Civil Engineering Docs', type: 'folder' },
 ];
 
-const BREADCRUMBS = ['Tool Name', 'Child Page Title', 'Active C...'];
+export const OBJECT_TREE_BREADCRUMBS = ['Tool Name', 'Child Page Title', 'Active C...'];
 
 function flattenObjNodes(nodes: ObjNode[]): ObjNode[] {
   return nodes.flatMap((node) => [node, ...(node.children ? flattenObjNodes(node.children) : [])]);
@@ -204,27 +217,13 @@ function buildObjectTreeByType(nodes: Array<{ id: string; label: string; ifcType
 function ObjectTreeToolbar() {
   const [query, setQuery] = useState('');
   return (
-    <div className="border-b border-[#e5e7eb]">
-      <div className="flex items-center gap-2 px-3 py-2">
-        <PanelSearchBar value={query} onChange={setQuery} placeholder="Filter by Keyword" />
-        <button
-          type="button"
-          aria-label="Filter"
-          className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100"
-        >
-          <img src={filterButtonIcon} alt="" width={16} height={16} />
-        </button>
-      </div>
-      <div className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-500 overflow-hidden">
-        {BREADCRUMBS.map((crumb, i) => (
-          <span key={crumb} className="flex items-center gap-1 shrink-0">
-            {i > 0 && <ChevronRight size={10} className="text-gray-400" />}
-            <span className={i === BREADCRUMBS.length - 1 ? 'font-semibold text-gray-800' : 'hover:underline cursor-pointer'}>
-              {crumb}
-            </span>
-          </span>
-        ))}
-      </div>
+    <div className="px-4 py-2 border-b border-[#d6dadc]">
+      <PanelSearchBar
+        value={query}
+        onChange={setQuery}
+        placeholder="Filter by Keyword"
+        onFilter={() => {}}
+      />
     </div>
   );
 }
@@ -369,15 +368,22 @@ function ObjectTreeContent() {
     return ids;
   }, [streamComplete, flatNodes]);
 
-  const [rootExpanded, setRootExpanded] = useState(true);
   const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [actionsOpen, setActionsOpen] = useState(false);
+  const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const actionsRef = useRef<HTMLDivElement>(null);
+  const actionMenuRef = useRef<HTMLDivElement>(null);
   const syncingFromModelSelectionRef = useRef(false);
   const totalObjects = flatNodes.length;
   const checkedCount = checkedIds.size;
-  const rootChecked = totalObjects > 0 && checkedCount === totalObjects;
+  const hasSelection = checkedCount > 0;
+  const masterCheckboxState: 'unchecked' | 'checked' | 'indeterminate' =
+    totalObjects > 0 && checkedCount === totalObjects
+      ? 'checked'
+      : checkedCount > 0
+        ? 'indeterminate'
+        : 'unchecked';
 
   useEffect(() => {
     setCheckedIds(new Set());
@@ -433,10 +439,14 @@ function ObjectTreeContent() {
     });
   }, []);
 
-  const onToggleRootChecked = useCallback((checked: boolean) => {
-    if (checked) setCheckedIds(new Set(flatNodes.map((node) => node.id)));
-    else setCheckedIds(new Set());
-  }, [flatNodes]);
+  // Master checkbox click:
+  // - any selection (full or partial) → clear selection
+  // - no selection → select all
+  // This matches the standard tri-state header behavior on lists like GitHub/Gmail.
+  const onToggleRootChecked = useCallback(() => {
+    if (checkedCount > 0) setCheckedIds(new Set());
+    else setCheckedIds(new Set(flatNodes.map((node) => node.id)));
+  }, [checkedCount, flatNodes]);
 
   const onToggleExpanded = useCallback((nodeId: string) => {
     setExpandedIds((prev) => {
@@ -458,6 +468,22 @@ function ObjectTreeContent() {
     return () => document.removeEventListener('mousedown', onClickOutside);
   }, [actionsOpen]);
 
+  useEffect(() => {
+    if (!actionMenuOpen) return;
+    const onClickOutside = (e: MouseEvent) => {
+      if (actionMenuRef.current && !actionMenuRef.current.contains(e.target as Node)) {
+        setActionMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    return () => document.removeEventListener('mousedown', onClickOutside);
+  }, [actionMenuOpen]);
+
+  // Close the action menu automatically if the selection is cleared.
+  useEffect(() => {
+    if (!hasSelection && actionMenuOpen) setActionMenuOpen(false);
+  }, [hasSelection, actionMenuOpen]);
+
   const onHideObjects = useCallback(() => {
     const checkedExpressIds = flatNodes
       .filter((node) => checkedIds.has(node.id))
@@ -471,67 +497,112 @@ function ObjectTreeContent() {
   }, [adapter, checkedIds, flatNodes]);
 
   return (
-    <div className="py-1">
-      {checkedCount > 0 && (
-        <div className="flex items-center justify-between border-b border-[#e5e7eb] bg-gray-50 px-2 py-1.5">
-          <span className="text-xs font-medium text-gray-600">{checkedCount} selected</span>
+    <div className="flex flex-col h-full">
+      {/*
+        Bulk actions row — non-scrolling header above the internal scroll
+        region. Lives outside the scroll container so the panel's scrollbar
+        starts below this row instead of overlapping it.
+      */}
+      <div
+        className={`flex items-center justify-between px-4 h-10 shadow-[0_1px_0_#dcdcdc] shrink-0 ${
+          hasSelection ? 'bg-[#EDF2FC]' : 'bg-white'
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          {/* Master checkbox — supports unchecked / checked / indeterminate */}
+          <button
+            type="button"
+            role="checkbox"
+            aria-checked={masterCheckboxState === 'indeterminate' ? 'mixed' : masterCheckboxState === 'checked'}
+            aria-label="Select all"
+            disabled={!!loadingIds || totalObjects === 0}
+            onClick={onToggleRootChecked}
+            className={`shrink-0 size-5 rounded-[2px] flex items-center justify-center transition-colors ${
+              masterCheckboxState === 'unchecked'
+                ? 'bg-white border-2 border-[#6A767C]'
+                : 'bg-[#2066DF]'
+            } ${loadingIds || totalObjects === 0 ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}`}
+          >
+            {masterCheckboxState === 'checked' && (
+              <Check size={14} strokeWidth={3} className="text-white" />
+            )}
+            {masterCheckboxState === 'indeterminate' && (
+              <span className="block w-[10px] h-[2px] bg-white" />
+            )}
+          </button>
+
+          {/* Selection-helper menu (anchored to caret) — kept for "Hide objects" parity. */}
           <div className="relative" ref={actionsRef}>
             <button
               type="button"
               onClick={() => setActionsOpen((o) => !o)}
-              className="h-7 rounded-md border border-gray-300 bg-white px-2 text-xs text-gray-700 flex items-center gap-1 hover:bg-gray-50"
+              aria-label="Bulk actions"
+              disabled={!!loadingIds}
+              className="w-6 h-6 flex items-center justify-center rounded shrink-0 hover:bg-black/5 disabled:opacity-30"
             >
-              Actions
-              <ChevronDown size={12} />
+              <ChevronDown size={16} className="text-[#6A767C]" />
             </button>
             {actionsOpen && (
-              <div className="absolute right-0 top-full mt-1 min-w-[140px] rounded-md border border-gray-200 bg-white shadow-lg z-50 py-1">
+              <div className="absolute left-0 top-full mt-1 min-w-[140px] rounded-md border border-gray-200 bg-white shadow-lg z-50 py-1">
                 <button
                   type="button"
                   onClick={onHideObjects}
-                  className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100"
+                  disabled={checkedCount === 0}
+                  className="w-full text-left px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                 >
                   Hide objects
                 </button>
               </div>
             )}
           </div>
-        </div>
-      )}
 
-      {/* Root row */}
-      <div className="flex items-center gap-1 hover:bg-gray-50 cursor-pointer select-none px-2 py-1.5">
-        <input
-          type="checkbox"
-          checked={rootChecked}
-          disabled={!!loadingIds}
-          onChange={(e) => onToggleRootChecked(e.target.checked)}
-          className={`w-4 h-4 shrink-0 accent-blue-500 ${loadingIds ? 'opacity-30 cursor-default' : 'cursor-pointer'}`}
-          onClick={(e) => e.stopPropagation()}
-        />
-        <button
-          type="button"
-          onClick={() => setRootExpanded((e) => !e)}
-          className="w-5 h-5 flex items-center justify-center shrink-0 text-gray-500"
-        >
-          {rootExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        </button>
-        <span className="flex-1" />
-        <span className="text-xs text-gray-500">{totalObjects} Objects</span>
+          {/* Action dropdown — only visible while a selection exists. */}
+          {hasSelection && (
+            <div className="relative" ref={actionMenuRef}>
+              <button
+                type="button"
+                onClick={() => setActionMenuOpen((o) => !o)}
+                aria-haspopup="menu"
+                aria-expanded={actionMenuOpen}
+                className="flex items-center gap-1 h-6 px-2 rounded text-[12px] leading-[16px] tracking-[0.25px] font-semibold text-[#232729] hover:bg-black/5"
+              >
+                Action
+                <ChevronDown size={14} className="text-[#232729]" />
+              </button>
+              {actionMenuOpen && (
+                <div
+                  role="menu"
+                  className="absolute left-0 top-full mt-1 min-w-[160px] rounded-md border border-gray-200 bg-white shadow-lg z-50 py-1"
+                >
+                  <div className="px-3 py-1.5 text-[12px] leading-[16px] tracking-[0.25px] text-[#6A767C] italic">
+                    No actions yet
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <span className="text-[12px] leading-[16px] tracking-[0.25px] text-[#232729]">
+          {hasSelection ? `${checkedCount} of ${totalObjects} Selected` : `${totalObjects} Items`}
+        </span>
       </div>
 
-      {rootExpanded && objectTreeNodes.map((node) => (
-        <ObjTreeNode
-          key={node.id}
-          node={node}
-          depth={0}
-          checkedIds={checkedIds}
-          expandedIds={expandedIds}
-          loadingIds={loadingIds}
-          onToggleChecked={onToggleChecked}
-          onToggleExpanded={onToggleExpanded}
-        />
-      ))}
+      <div className="flex-1 min-h-0 overflow-y-auto">
+        <div className="py-1">
+          {objectTreeNodes.map((node) => (
+            <ObjTreeNode
+              key={node.id}
+              node={node}
+              depth={0}
+              checkedIds={checkedIds}
+              expandedIds={expandedIds}
+              loadingIds={loadingIds}
+              onToggleChecked={onToggleChecked}
+              onToggleExpanded={onToggleExpanded}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -719,43 +790,30 @@ export function PropertiesContent({ propertiesTab = 'all-properties' }: { proper
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 flex-1 overflow-hidden bg-[#f4f5f6]">
-      {/* Search bar — stays fixed above the scrollable area */}
-      <div className="shrink-0 flex items-center gap-2 px-3 py-2 bg-white border-b border-[#e5e7eb]">
-        <PanelSearchBar
-          value={searchQuery}
-          onChange={setSearchQuery}
-          placeholder="Search properties"
+    <div className="flex flex-col gap-2">
+      <PanelSearchBar
+        value={searchQuery}
+        onChange={setSearchQuery}
+        placeholder="Search properties"
+        onFilter={() => {}}
+      />
+      {favoritesGroup && (
+        <PropertyGroupCard
+          group={favoritesGroup}
+          favoriteKeys={favoriteKeys}
+          onToggleFavorite={handleToggleFavorite}
+          searchQuery={searchQuery}
         />
-        <button
-          type="button"
-          aria-label="Filter properties"
-          className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100"
-        >
-          <img src={filterButtonIcon} alt="" width={16} height={16} />
-        </button>
-      </div>
-
-      {/* Property groups — only this area scrolls */}
-      <div className="flex-1 min-h-0 overflow-y-auto p-3 flex flex-col gap-2">
-        {favoritesGroup && (
-          <PropertyGroupCard
-            group={favoritesGroup}
-            favoriteKeys={favoriteKeys}
-            onToggleFavorite={handleToggleFavorite}
-            searchQuery={searchQuery}
-          />
-        )}
-        {groups.map((g) => (
-          <PropertyGroupCard
-            key={g.name}
-            group={g}
-            favoriteKeys={favoriteKeys}
-            onToggleFavorite={handleToggleFavorite}
-            searchQuery={searchQuery}
-          />
-        ))}
-      </div>
+      )}
+      {groups.map((g) => (
+        <PropertyGroupCard
+          key={g.name}
+          group={g}
+          favoriteKeys={favoriteKeys}
+          onToggleFavorite={handleToggleFavorite}
+          searchQuery={searchQuery}
+        />
+      ))}
     </div>
   );
 }
@@ -772,15 +830,13 @@ export function PropertiesToolbar({ propertiesTab = 'all-properties' }: { proper
 function ViewsToolbar() {
   const [query, setQuery] = useState('');
   return (
-    <div className="flex items-center gap-2 px-3 py-2 border-b border-[#e5e7eb]">
-      <PanelSearchBar value={query} onChange={setQuery} placeholder="Search viewpoints" />
-      <button
-        type="button"
-        aria-label="Filter"
-        className="w-7 h-7 flex items-center justify-center rounded hover:bg-gray-100"
-      >
-        <img src={filterButtonIcon} alt="" width={16} height={16} />
-      </button>
+    <div className="px-4 py-2 border-b border-[#d6dadc]">
+      <PanelSearchBar
+        value={query}
+        onChange={setQuery}
+        placeholder="Search viewpoints"
+        onFilter={() => {}}
+      />
     </div>
   );
 }
@@ -1065,7 +1121,7 @@ function ViewsContent() {
   }, [adapter, selectedViewId]);
 
   return (
-    <div className="py-1 relative min-h-full" onClick={handleBackgroundClick}>
+    <div className="bg-white rounded-md overflow-hidden py-1 relative min-h-full" onClick={handleBackgroundClick}>
       {views.length === 0 && folders.length === 0 && (
         <p className="px-3 py-6 text-sm text-gray-400 text-center">
           No views yet. Enter markup mode to create one.
